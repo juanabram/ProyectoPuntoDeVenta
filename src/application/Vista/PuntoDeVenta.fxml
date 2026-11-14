@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane minHeight="600.0" minWidth="900.0" prefHeight="720.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
+   <!-- ==================== PARTE SUPERIOR (MENÚ Y DATOS DE SESIÓN) ==================== -->
+   <top>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <!-- Barra de Menús Principal -->
+            <MenuBar>
+              <menus>
+                <Menu mnemonicParsing="false" text="Venta">
+                  <items>
+                    <MenuItem fx:id="menuNuevaVenta" mnemonicParsing="false" text="Nueva Venta (Ctrl+N)" />
+                    <MenuItem fx:id="menuPonerEnEspera" mnemonicParsing="false" text="Poner Venta en Espera (F7)" />
+                    <MenuItem fx:id="menuRecuperarVenta" mnemonicParsing="false" text="Recuperar Venta Pendiente" />
+                    <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem fx:id="menuCancelarVenta" mnemonicParsing="false" text="Cancelar Venta Actual (Esc)" />
+                    <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem fx:id="menuSalir" mnemonicParsing="false" text="Salir del Sistema" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Operaciones de Caja">
+                  <items>
+                    <MenuItem fx:id="menuEntradaEfectivo" mnemonicParsing="false" text="Entrada de Efectivo..." />
+                    <MenuItem fx:id="menuSalidaEfectivo" mnemonicParsing="false" text="Salida / Retiro de Efectivo..." />
+                    <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem fx:id="menuCorteX" mnemonicParsing="false" text="Corte Parcial (Corte X)" />
+                    <MenuItem fx:id="menuCorteZ" mnemonicParsing="false" text="Corte del Día / Cierre de Turno (Corte Z)" />
+                    <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem fx:id="menuHistorialVentas" mnemonicParsing="false" text="Historial de Ventas del Día" />
+                    <MenuItem fx:id="menuDevoluciones" mnemonicParsing="false" text="Devolución de Producto" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Catálogo">
+                  <items>
+                    <MenuItem fx:id="menuBuscarProducto" mnemonicParsing="false" text="Buscar Producto en Catálogo (F2)" />
+                    <MenuItem fx:id="menuListaPrecios" mnemonicParsing="false" text="Consultar Precios" />
+                    <MenuItem fx:id="menuPromociones" mnemonicParsing="false" text="Promociones y Ofertas Activas" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Servicios">
+                  <items>
+                    <MenuItem fx:id="menuRecargas" mnemonicParsing="false" text="Recargas Electrónicas (F5)" />
+                    <MenuItem fx:id="menuPagoServicios" mnemonicParsing="false" text="Pago de Servicios (Luz, Agua, Gas, etc.) (F6)" />
+                    <MenuItem fx:id="menuPines" mnemonicParsing="false" text="Tarjetas de Regalo / Pines Digitales" />
+                    <MenuItem fx:id="menuDepositos" mnemonicParsing="false" text="Depósitos / Envíos de Dinero" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Configuración">
+                  <items>
+                    <MenuItem fx:id="menuAjustesCaja" mnemonicParsing="false" text="Ajustes de Terminal" />
+                    <MenuItem fx:id="menuImpresora" mnemonicParsing="false" text="Configuración de Ticket / Impresora" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Ayuda">
+                  <items>
+                    <MenuItem fx:id="menuAtajos" mnemonicParsing="false" text="Guía de Atajos de Teclado (F1)" />
+                    <MenuItem fx:id="menuAcercaDe" mnemonicParsing="false" text="Acerca del Punto de Venta" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+            
+            <!-- Barra de Información de Sucursal y Cajero -->
+            <HBox alignment="CENTER_LEFT" spacing="15.0">
+               <children>
+                  <Label text="Tienda: Tienda Express - Sucursal Centro" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="Caja: 01" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblCajero" text="Cajero: Juan Pérez (Turno Matutino)" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblEstadoCaja" text="Estado: En Servicio" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="lblFechaHora" text="Fecha: 13/11/2026 | Hora: 23:00" />
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
+               </padding>
+            </HBox>
+            <Separator />
+         </children>
+      </VBox>
+   </top>
+
+   <!-- ==================== CENTRO (CAPTURA DE PRODUCTOS Y TABLA DE VENTA) ==================== -->
+   <center>
+      <VBox spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <!-- Barra de Captura Rápida de Artículos -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="Código de Barras:" />
+                  <TextField fx:id="txtCodigoBarras" promptText="Escanee o ingrese código de barras..." HBox.hgrow="ALWAYS" />
+                  <Label text="Cantidad:" />
+                  <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" text="1" />
+                  <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" text="Agregar (Enter)" />
+                  <Button fx:id="btnBuscar" mnemonicParsing="false" text="Buscar Producto (F2)" />
+               </children>
+            </HBox>
+            
+            <!-- Tabla Principal del Carrito de Venta -->
+            <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
+              <columns>
+                <TableColumn fx:id="colNumero" prefWidth="40.0" text="#" />
+                <TableColumn fx:id="colCodigo" prefWidth="130.0" text="Código" />
+                <TableColumn fx:id="colDescripcion" prefWidth="280.0" text="Descripción del Producto" />
+                <TableColumn fx:id="colPrecio" prefWidth="95.0" text="Precio Unit." />
+                <TableColumn fx:id="colCantidad" prefWidth="70.0" text="Cantidad" />
+                <TableColumn fx:id="colUnidad" prefWidth="75.0" text="Unidad" />
+                <TableColumn fx:id="colDescuento" prefWidth="90.0" text="Descuento" />
+                <TableColumn fx:id="colImporte" prefWidth="110.0" text="Importe" />
+              </columns>
+            </TableView>
+            
+            <!-- Barra de Botones de Acción para la Tabla -->
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" text="Eliminar Artículo (Supr)" />
+                  <Button fx:id="btnModificarCantidad" mnemonicParsing="false" text="Modificar Cantidad (F4)" />
+                  <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" text="Aplicar Descuento / Cupón" />
+                  <Button fx:id="btnPonerEnEspera" mnemonicParsing="false" text="Venta en Espera (F7)" />
+                  <Button fx:id="btnRecuperarVenta" mnemonicParsing="false" text="Recuperar Venta" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Button fx:id="btnCancelarVenta" mnemonicParsing="false" text="Cancelar Venta (Esc)" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="12.0" right="8.0" top="10.0" />
+         </padding>
+      </VBox>
+   </center>
+
+   <!-- ==================== LATERAL DERECHO (SERVICIOS, RESUMEN Y COBRO) ==================== -->
+   <right>
+      <VBox prefWidth="350.0" spacing="10.0" BorderPane.alignment="CENTER">
+         <children>
+            <!-- Panel 1: Servicios de Conveniencia -->
+            <TitledPane animated="false" text="Servicios Rápidos">
+               <content>
+                  <GridPane hgap="8.0" vgap="8.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Button fx:id="btnRecargas" maxWidth="Infinity" mnemonicParsing="false" text="Recargas (F5)" />
+                        <Button fx:id="btnPagoServicios" maxWidth="Infinity" mnemonicParsing="false" text="Pago Servicios (F6)" GridPane.columnIndex="1" />
+                        <Button fx:id="btnPines" maxWidth="Infinity" mnemonicParsing="false" text="Tarjetas de Regalo" GridPane.rowIndex="1" />
+                        <Button fx:id="btnDepositos" maxWidth="Infinity" mnemonicParsing="false" text="Depósitos / Retiros" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+               </content>
+            </TitledPane>
+
+            <!-- Panel 2: Datos de Cliente / Monedero -->
+            <TitledPane animated="false" text="Cliente / Puntos">
+               <content>
+                  <GridPane hgap="8.0" vgap="6.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="NEVER" minWidth="60.0" />
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Cliente:" />
+                        <TextField fx:id="txtCliente" promptText="Público General / No. Tarjeta" GridPane.columnIndex="1" />
+                        <Label text="Puntos:" GridPane.rowIndex="1" />
+                        <Label fx:id="lblPuntos" text="0 pts acumulados" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                     </children>
+                  </GridPane>
+               </content>
+            </TitledPane>
+
+            <!-- Panel 3: Resumen de Totales -->
+            <TitledPane animated="false" collapsible="false" text="Resumen de Cuenta">
+               <content>
+                  <GridPane hgap="10.0" vgap="6.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                      <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="80.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="6.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                      <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <Label text="Artículos en canasta:" />
+                        <Label fx:id="lblNumArticulos" text="0" GridPane.columnIndex="1" />
+                        <Label text="Subtotal:" GridPane.rowIndex="1" />
+                        <Label fx:id="lblSubtotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label text="Descuentos:" GridPane.rowIndex="2" />
+                        <Label fx:id="lblDescuento" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <Label text="IVA (16%):" GridPane.rowIndex="3" />
+                        <Label fx:id="lblIva" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <Separator GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                        <Label text="TOTAL A PAGAR:" GridPane.rowIndex="5">
+                           <font>
+                              <Font name="System Bold" size="16.0" />
+                           </font>
+                        </Label>
+                        <Label fx:id="lblTotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                           <font>
+                              <Font name="System Bold" size="20.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </GridPane>
+               </content>
+            </TitledPane>
+
+            <!-- Panel 4: Cobro y Pago -->
+            <TitledPane animated="false" collapsible="false" text="Liquidación / Cobro" VBox.vgrow="ALWAYS">
+               <content>
+                  <VBox spacing="8.0">
+                     <children>
+                        <Label text="Método de Pago:" />
+                        <ComboBox fx:id="cmbMetodoPago" maxWidth="Infinity" promptText="Efectivo" />
+                        <GridPane hgap="8.0" vgap="6.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                            <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                            <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Label text="Paga con ($):" />
+                              <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="1" />
+                              <Label text="Cambio:" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="13.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="lblCambio" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="System Bold" size="16.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </GridPane>
+                        <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Imprimir comprobante / ticket" />
+                        <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="42.0" mnemonicParsing="false" text="COBRAR / FINALIZAR (F12)">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font>
+                        </Button>
+                     </children>
+                  </VBox>
+               </content>
+            </TitledPane>
+         </children>
+         <padding>
+            <Insets bottom="10.0" left="8.0" right="12.0" top="10.0" />
+         </padding>
+      </VBox>
+   </right>
+
+   <!-- ==================== PARTE INFERIOR (BARRA DE ESTADO Y TECLAS DE ATAJO) ==================== -->
+   <bottom>
+      <VBox BorderPane.alignment="CENTER">
+         <children>
+            <Separator />
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
+               <children>
+                  <Label text="[F1] Ayuda" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F2] Buscar Prod." />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F4] Cantidad" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F5] Recargas" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F6] Pago Serv." />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F7] Espera" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[F12] Cobrar" />
+                  <Separator orientation="VERTICAL" />
+                  <Label text="[Esc] Cancelar" />
+                  <Region HBox.hgrow="ALWAYS" />
+                  <Label fx:id="lblMensajeEstado" text="Listo para escanear productos..." />
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
+               </padding>
+            </HBox>
+         </children>
+      </VBox>
+   </bottom>
+</BorderPane>
