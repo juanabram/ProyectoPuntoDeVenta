@@ -28,7 +28,6 @@ public class Controlador {
         configurarEventosInventario();
         configurarEventosDevoluciones();
         configurarEventosReportes();
-        configurarEventosIA();
     }
 
     /**
@@ -66,7 +65,7 @@ public class Controlador {
 
         vista.getMenuAcercaDe().setOnAction(e -> {
             mostrarAlerta("Acerca del Proyecto", "Proyecto Integrador - Sistema Punto de Venta",
-                "Arquitectura MVC con JavaFX, JasperReports, Base de Datos e IA.\nCumple con normativas ISO y rúbricas CACEI.", AlertType.INFORMATION);
+                "Arquitectura MVC con JavaFX, JasperReports y Base de Datos Relacional.\nCumple con normativas ISO y rúbricas CACEI.", AlertType.INFORMATION);
         });
     }
 
@@ -131,14 +130,6 @@ public class Controlador {
 
         vista.getCmbCategoriaReporte().setItems(vista.getCmbFiltroCategoria().getItems());
         vista.getCmbCategoriaReporte().getSelectionModel().selectFirst();
-
-        // Pestaña 6: Funciones de IA
-        vista.getCmbFuncionIA().setItems(FXCollections.observableArrayList(
-            "Reabastecimiento Sugerido Inteligente",
-            "Predicción de Demanda Semanal",
-            "Análisis de Tendencias de Venta"
-        ));
-        vista.getCmbFuncionIA().getSelectionModel().selectFirst();
 
         // Estado inicial
         vista.getLblAlertaStock().setText("[!] Alerta: 2 productos con stock mínimo");
@@ -337,32 +328,6 @@ public class Controlador {
             mostrarAlerta("JasperReports", "Exportación a PDF",
                 "Generando archivo PDF con logotipo y fecha/hora: '" + rep + ".pdf'.", AlertType.INFORMATION);
             vista.getLblEstadoReporte().setText("Archivo PDF exportado exitosamente.");
-        });
-    }
-
-    /**
-     * Configura eventos de la Pestaña 6: Asistente IA.
-     */
-    private void configurarEventosIA() {
-        vista.getBtnEjecutarIA().setOnAction(e -> {
-            String funcion = vista.getCmbFuncionIA().getValue();
-            vista.getTxtResultadoIA().setText(
-                "=== RESULTADO DEL MODELO DE INTELIGENCIA ARTIFICIAL ===\n" +
-                "Análisis: " + funcion + "\n" +
-                "Fecha y Hora: " + LocalDateTime.now() + "\n\n" +
-                "• Diagnóstico: Se detectaron 2 productos con tendencia de alta demanda para este fin de semana.\n" +
-                "• Sugerencia de Reabastecimiento:\n" +
-                "   - Refresco Cola 600ml: Sugerido pedir 48 unidades (Stock actual: 4).\n" +
-                "   - Frituras Variadas: Sugerido pedir 30 unidades (Stock actual: 2).\n\n" +
-                "• Impacto esperado: Prevención de desabasto y optimización del flujo de ventas."
-            );
-            vista.getLblMensajeEstado().setText("Análisis de IA completado exitosamente.");
-        });
-
-        vista.getBtnAplicarRecomendacionIA().setOnAction(e -> {
-            mostrarAlerta("Inteligencia Artificial", "Recomendación Aplicada",
-                "Se transfirieron las cantidades sugeridas como solicitud al módulo de compras/inventario.", AlertType.INFORMATION);
-            seleccionarPestana(vista.getTabInventario());
         });
     }
 

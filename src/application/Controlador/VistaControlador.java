@@ -45,7 +45,6 @@ public class VistaControlador {
     @FXML private Tab tabInventario;
     @FXML private Tab tabDevoluciones;
     @FXML private Tab tabReportes;
-    @FXML private Tab tabIA;
 
     // ==========================================
     // PESTAÑA 1: CAJA / VENTAS
@@ -159,14 +158,6 @@ public class VistaControlador {
     @FXML private TextArea txtDetallesReporte;
 
     // ==========================================
-    // PESTAÑA 6: ASISTENTE IA
-    // ==========================================
-    @FXML private ComboBox<String> cmbFuncionIA;
-    @FXML private Button btnEjecutarIA;
-    @FXML private TextArea txtResultadoIA;
-    @FXML private Button btnAplicarRecomendacionIA;
-
-    // ==========================================
     // BARRA INFERIOR (ESTADO Y ALERTAS)
     // ==========================================
     @FXML private Label lblAlertaStock;
@@ -192,7 +183,6 @@ public class VistaControlador {
     public Tab getTabInventario() { return tabInventario; }
     public Tab getTabDevoluciones() { return tabDevoluciones; }
     public Tab getTabReportes() { return tabReportes; }
-    public Tab getTabIA() { return tabIA; }
 
     // Ventas
     public TextField getTxtCodigoBarras() { return txtCodigoBarras; }
@@ -267,12 +257,6 @@ public class VistaControlador {
     public Button getBtnExportarPDF() { return btnExportarPDF; }
     public Label getLblEstadoReporte() { return lblEstadoReporte; }
     public TextArea getTxtDetallesReporte() { return txtDetallesReporte; }
-
-    // IA
-    public ComboBox<String> getCmbFuncionIA() { return cmbFuncionIA; }
-    public Button getBtnEjecutarIA() { return btnEjecutarIA; }
-    public TextArea getTxtResultadoIA() { return txtResultadoIA; }
-    public Button getBtnAplicarRecomendacionIA() { return btnAplicarRecomendacionIA; }
 
     // Barra inferior
     public Label getLblAlertaStock() { return lblAlertaStock; }
