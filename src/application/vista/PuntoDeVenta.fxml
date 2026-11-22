@@ -29,7 +29,7 @@
 <?import javafx.scene.text.Font?>
 
 <BorderPane minHeight="650.0" minWidth="980.0" prefHeight="740.0" prefWidth="1120.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
-   <!-- ==================== PARTE SUPERIOR (MENÚ Y ACCESOS A PESTAÑAS) ==================== -->
+   <!-- ==================== PARTE SUPERIOR (MENÚ Y DATOS DE SESIÓN) ==================== -->
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
@@ -44,17 +44,6 @@
                     <MenuItem fx:id="menuSalir" mnemonicParsing="false" text="Salir del Sistema" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Pestañas / Módulos">
-                  <items>
-                    <MenuItem fx:id="menuNavVentas" mnemonicParsing="false" text="Caja / Ventas" />
-                    <MenuItem fx:id="menuNavProductos" mnemonicParsing="false" text="Gestión de Productos y Categorías" />
-                    <MenuItem fx:id="menuNavInventario" mnemonicParsing="false" text="Gestión de Inventario y Existencias" />
-                    <MenuItem fx:id="menuNavDevoluciones" mnemonicParsing="false" text="Gestión de Devoluciones" />
-                    <MenuItem fx:id="menuNavReportes" mnemonicParsing="false" text="Reportes JasperReports" />
-                    <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem fx:id="menuNavIA" mnemonicParsing="false" text="Asistente de IA (Predicción / Demanda)" />
-                  </items>
-                </Menu>
                 <Menu mnemonicParsing="false" text="Ayuda">
                   <items>
                     <MenuItem fx:id="menuAtajos" mnemonicParsing="false" text="Atajos de Teclado (F1)" />
@@ -64,22 +53,22 @@
               </menus>
             </MenuBar>
             
-            <!-- Barra Superior de Navegación Rápida -->
-            <ToolBar>
-               <items>
-                  <Button fx:id="btnNavVentas" mnemonicParsing="false" text="Caja / Ventas" />
+            <!-- Encabezado de Sesión y Terminal -->
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+               <children>
+                  <Label text="Punto de Venta" />
                   <Separator orientation="VERTICAL" />
-                  <Button fx:id="btnNavProductos" mnemonicParsing="false" text="Productos y Categorías" />
-                  <Button fx:id="btnNavInventario" mnemonicParsing="false" text="Inventario y Stock" />
-                  <Button fx:id="btnNavDevoluciones" mnemonicParsing="false" text="Devoluciones" />
-                  <Button fx:id="btnNavReportes" mnemonicParsing="false" text="Reportes (JasperReports)" />
-                  <Button fx:id="btnNavIA" mnemonicParsing="false" text="Asistente IA" />
+                  <Label text="Caja: 01" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblSesion" text="Cajero: Turno Activo" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblSesion" text="Caja 01 | Cajero: Turno Activo" />
-                  <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblFechaHora" text="13/11/2026 | 23:00" />
-               </items>
-            </ToolBar>
+                  <Label fx:id="lblFechaHora" text="22/11/2026 | 12:18" />
+               </children>
+               <padding>
+                  <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
+               </padding>
+            </HBox>
+            <Separator />
          </children>
       </VBox>
    </top>
