@@ -88,16 +88,19 @@
                            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="scanner-bar">
                               <children>
                                  <Label styleClass="scanner-label" text="Código:" />
-                                 <TextField fx:id="txtCodigoBarras" promptText="Escanear código o teclear [F2]..." styleClass="scanner-input" HBox.hgrow="ALWAYS" />
+                                 <TextField fx:id="txtCodigoBarras" accessibleHelp="Teclee o escanee el código del producto y presione Enter" accessibleText="Código de barras o SKU del producto" promptText="Escanear código o teclear [F2]..." styleClass="scanner-input" HBox.hgrow="ALWAYS" />
                                  <Label styleClass="scanner-label" text="Cant:" />
-                                 <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" styleClass="qty-input" text="1" />
-                                 <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar" />
-                                 <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar (F2)" />
+                                 <TextField fx:id="txtCantidad" accessibleHelp="Número de unidades a vender" accessibleText="Cantidad de piezas" alignment="CENTER" prefWidth="60.0" styleClass="qty-input" text="1" />
+                                 <Button fx:id="btnAgregar" accessibleText="Agregar producto al carrito de venta" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar" />
+                                 <Button fx:id="btnBuscar" accessibleText="Buscar producto en el catálogo" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar (F2)" />
                               </children>
                            </HBox>
                           
                           <!-- Tabla de Ventas -->
                           <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
+                             <columnResizePolicy>
+                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                             </columnResizePolicy>
                             <columns>
                               <TableColumn fx:id="colNumero" prefWidth="40.0" text="#" />
                               <TableColumn fx:id="colCodigo" prefWidth="130.0" text="Código" />
@@ -182,7 +185,7 @@
                                    </rowConstraints>
                                     <children>
                                        <Label styleClass="deck-label" text="Paga con ($):" />
-                                       <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" styleClass="font-mono" GridPane.columnIndex="1" />
+                                       <TextField fx:id="txtPagaCon" accessibleText="Monto en efectivo recibido del cliente" alignment="CENTER_RIGHT" promptText="0.00" styleClass="font-mono" GridPane.columnIndex="1" />
                                        <Label text="Cambio:" GridPane.rowIndex="1">
                                           <font>
                                              <Font name="System Bold" size="13.0" />
@@ -193,7 +196,7 @@
                                  </GridPane>
                                  <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Imprimir ticket" />
                                  <Region VBox.vgrow="ALWAYS" />
-                                 <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="46.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR (F12)" />
+                                 <Button fx:id="btnCobrar" accessibleText="Cobrar y liquidar venta actual con tecla F12" maxWidth="Infinity" minHeight="46.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR (F12)" />
                               </children>
                            </VBox>
                         </children>
@@ -215,7 +218,7 @@
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
                           <Label text="Buscar:" />
-                          <TextField fx:id="txtBuscarCatalogo" promptText="Buscar por nombre o código..." HBox.hgrow="ALWAYS" />
+                          <TextField fx:id="txtBuscarCatalogo" accessibleText="Campo de búsqueda de productos por nombre o código" promptText="Buscar por nombre o código..." HBox.hgrow="ALWAYS" />
                           <Label text="Categoría:" />
                           <ComboBox fx:id="cmbFiltroCategoria" prefWidth="180.0" promptText="Todas las categorías" />
                           <Button fx:id="btnFiltrarProductos" mnemonicParsing="false" styleClass="btn-secondary" text="Filtrar" />
@@ -225,6 +228,9 @@
                     
                     <!-- Tabla del Catálogo de Productos (Mínimo 400 productos) -->
                     <TableView fx:id="tblCatalogoProductos" VBox.vgrow="ALWAYS">
+                             <columnResizePolicy>
+                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                             </columnResizePolicy>
                       <columns>
                         <TableColumn fx:id="colCatCodigo" prefWidth="110.0" text="Código" />
                         <TableColumn fx:id="colCatNombre" prefWidth="250.0" text="Nombre" />
@@ -276,6 +282,9 @@
                     
                     <!-- Tabla de Control de Inventario -->
                     <TableView fx:id="tblInventario" VBox.vgrow="ALWAYS">
+                             <columnResizePolicy>
+                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                             </columnResizePolicy>
                       <columns>
                         <TableColumn fx:id="colInvCodigo" prefWidth="110.0" text="Código" />
                         <TableColumn fx:id="colInvProducto" prefWidth="280.0" text="Descripción del Producto" />
@@ -314,7 +323,7 @@
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
                           <Label text="Folio / Ticket:" />
-                          <TextField fx:id="txtFolioDevolucion" promptText="Número de folio..." prefWidth="250.0" />
+                          <TextField fx:id="txtFolioDevolucion" accessibleText="Número de folio de ticket de la venta a devolver" promptText="Número de folio..." prefWidth="250.0" />
                           <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar" />
                           <Separator orientation="VERTICAL" />
                           <Label fx:id="lblInfoTicketDevolucion" text="Ticket no consultado" />
@@ -323,6 +332,9 @@
                     
                     <!-- Tabla de Productos de la Venta a Devolver -->
                     <TableView fx:id="tblDevoluciones" VBox.vgrow="ALWAYS">
+                             <columnResizePolicy>
+                               <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                             </columnResizePolicy>
                       <columns>
                         <TableColumn fx:id="colDevCodigo" prefWidth="110.0" text="Código" />
                         <TableColumn fx:id="colDevDescripcion" prefWidth="300.0" text="Descripción del Producto" />

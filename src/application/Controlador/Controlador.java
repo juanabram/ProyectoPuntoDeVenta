@@ -1,7 +1,9 @@
 package application.Controlador;
 
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -18,6 +20,11 @@ import javafx.scene.control.TextInputDialog;
 public class Controlador {
 
     private VistaControlador vista;
+    private static final NumberFormat FORMATO_MONEDA = NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-MX"));
+
+    public static String formatearMoneda(double monto) {
+        return FORMATO_MONEDA.format(monto);
+    }
 
     public Controlador(VistaControlador vista) {
         this.vista = vista;
@@ -138,6 +145,21 @@ public class Controlador {
             vista.getSepAlertaStock().visibleProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
             vista.getSepAlertaStock().managedProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
         }
+
+        // Filtros de entrada y cálculo reactivo de cambio (Hardening)
+        vista.getTxtCantidad().textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*")) {
+                vista.getTxtCantidad().setText(newVal.replaceAll("[^\\d]", ""));
+            }
+        });
+
+        vista.getTxtPagaCon().textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.matches("\\d*(\\.\\d{0,2})?")) {
+                vista.getTxtPagaCon().setText(oldVal);
+                return;
+            }
+            calcularCambio();
+        });
 
         // Estado inicial
         actualizarAlertaStock();
@@ -365,11 +387,30 @@ public class Controlador {
         vista.getLblTotalProductosRegistrados().setText(total + " productos");
     }
 
+    /**
+     * Calcula dinámicamente el cambio al recibir el pago en efectivo (Hardening).
+     */
+    private void calcularCambio() {
+        try {
+            String strPaga = vista.getTxtPagaCon().getText().trim();
+            if (strPaga.isEmpty()) {
+                vista.getLblCambio().setText(formatearMoneda(0.0));
+                return;
+            }
+            double pagaCon = Double.parseDouble(strPaga);
+            double total = 0.0;
+            double cambio = Math.max(0.0, pagaCon - total);
+            vista.getLblCambio().setText(formatearMoneda(cambio));
+        } catch (NumberFormatException e) {
+            vista.getLblCambio().setText(formatearMoneda(0.0));
+        }
+    }
+
     private void limpiarCamposVenta() {
         vista.getTxtCodigoBarras().clear();
         vista.getTxtCantidad().setText("1");
         vista.getTxtPagaCon().clear();
-        vista.getLblCambio().setText("$ 0.00");
+        vista.getLblCambio().setText(formatearMoneda(0.0));
         vista.getTxtCodigoBarras().requestFocus();
     }
 
