@@ -84,17 +84,17 @@
                  <center>
                     <VBox spacing="10.0">
                        <children>
-                          <!-- Barra de Captura Rápida de Artículos -->
-                          <HBox alignment="CENTER_LEFT" spacing="10.0">
-                             <children>
-                                <Label text="Código de Barras:" />
-                                <TextField fx:id="txtCodigoBarras" promptText="Escanee o teclee el código de barras..." HBox.hgrow="ALWAYS" />
-                                <Label text="Cant:" />
-                                <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" text="1" />
-                                <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar (Enter)" />
-                                <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar en Catálogo (F2)" />
-                             </children>
-                          </HBox>
+                          <!-- Barra de Captura Rápida de Artículos (Scanner Hero Area) -->
+                           <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="scanner-bar">
+                              <children>
+                                 <Label styleClass="scanner-label" text="CÓDIGO / SKU:" />
+                                 <TextField fx:id="txtCodigoBarras" promptText="Escanee código de barras o teclee F2 para buscar..." styleClass="scanner-input" HBox.hgrow="ALWAYS" />
+                                 <Label styleClass="scanner-label" text="CANT:" />
+                                 <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" styleClass="qty-input" text="1" />
+                                 <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar (Enter)" />
+                                 <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Catálogo (F2)" />
+                              </children>
+                           </HBox>
                           
                           <!-- Tabla de Ventas -->
                           <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
@@ -126,98 +126,79 @@
                     </VBox>
                  </center>
                  
-                 <!-- Panel Lateral de Totales y Cobro -->
-                 <right>
-                    <VBox prefWidth="330.0" spacing="12.0" styleClass="side-panel">
-                       <children>
-                          <!-- Resumen de Venta -->
-                          <TitledPane animated="false" collapsible="false" text="Resumen de la Venta">
-                             <content>
-                                <GridPane hgap="10.0" vgap="8.0">
-                                  <columnConstraints>
-                                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
-                                  </columnConstraints>
-                                  <rowConstraints>
-                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="6.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                                    <RowConstraints minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
-                                  </rowConstraints>
-                                   <children>
-                                      <Label text="Artículos en canasta:" />
-                                      <Label fx:id="lblNumArticulos" text="0" GridPane.columnIndex="1" />
-                                      <Label text="Subtotal:" GridPane.rowIndex="1" />
-                                      <Label fx:id="lblSubtotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                      <Label text="Descuentos:" GridPane.rowIndex="2" />
-                                      <Label fx:id="lblDescuento" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                      <Label text="IVA (16%):" GridPane.rowIndex="3" />
-                                      <Label fx:id="lblIva" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                      <Separator GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                                      <Label text="TOTAL A PAGAR:" GridPane.rowIndex="5">
-                                         <font>
-                                            <Font name="System Bold" size="16.0" />
-                                         </font>
-                                      </Label>
-                                      <Label fx:id="lblTotal" styleClass="total-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                                         <font>
-                                            <Font name="System Bold" size="20.0" />
-                                         </font>
-                                      </Label>
-                                   </children>
-                                </GridPane>
-                             </content>
-                          </TitledPane>
-
-                          <!-- Cobro y Liquidación -->
-                          <TitledPane animated="false" collapsible="false" text="Liquidación y Cobro" VBox.vgrow="ALWAYS">
-                             <content>
-                                <VBox spacing="10.0">
-                                   <children>
-                                      <Label text="Método de Pago:" />
-                                      <ComboBox fx:id="cmbMetodoPago" maxWidth="Infinity" promptText="Seleccionar forma de pago" />
-                                      <GridPane hgap="8.0" vgap="8.0">
-                                        <columnConstraints>
-                                          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                                          <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
-                                        </columnConstraints>
-                                        <rowConstraints>
-                                          <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-                                          <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-                                        </rowConstraints>
-                                         <children>
-                                            <Label text="Paga con ($):" />
-                                            <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="1" />
-                                            <Label text="Cambio:" GridPane.rowIndex="1">
-                                               <font>
-                                                  <Font name="System Bold" size="13.0" />
-                                               </font>
-                                            </Label>
-                                            <Label fx:id="lblCambio" styleClass="change-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                               <font>
-                                                  <Font name="System Bold" size="16.0" />
-                                               </font>
-                                            </Label>
-                                         </children>
-                                      </GridPane>
-                                      <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Generar Ticket de Venta" />
-                                      <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="48.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR Y GENERAR TICKET (F12)" wrapText="true">
-                                         <font>
-                                            <Font name="System Bold" size="13.0" />
-                                         </font>
-                                      </Button>
-                                   </children>
-                                </VBox>
-                             </content>
-                          </TitledPane>
-                       </children>
-                       <padding>
-                          <Insets bottom="10.0" left="8.0" right="12.0" top="10.0" />
-                       </padding>
-                    </VBox>
-                 </right>
+                 <!-- Panel Lateral de Totales y Cobro (Checkout Deck) -->
+                  <right>
+                     <VBox prefWidth="340.0" spacing="12.0" styleClass="checkout-deck">
+                        <children>
+                           <!-- Resumen de Venta -->
+                           <Label styleClass="deck-section-title" text="RESUMEN DE VENTA" />
+                           <GridPane hgap="10.0" vgap="7.0">
+                             <columnConstraints>
+                               <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                               <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
+                             </columnConstraints>
+                             <rowConstraints>
+                               <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                               <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                               <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                               <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
+                             </rowConstraints>
+                              <children>
+                                 <Label styleClass="deck-label" text="Artículos en canasta:" />
+                                 <Label fx:id="lblNumArticulos" styleClass="deck-value" text="0" GridPane.columnIndex="1" />
+                                 <Label styleClass="deck-label" text="Subtotal:" GridPane.rowIndex="1" />
+                                 <Label fx:id="lblSubtotal" styleClass="deck-value" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                 <Label styleClass="deck-label" text="Descuentos:" GridPane.rowIndex="2" />
+                                 <Label fx:id="lblDescuento" styleClass="deck-value" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                 <Label styleClass="deck-label" text="IVA (16%):" GridPane.rowIndex="3" />
+                                 <Label fx:id="lblIva" styleClass="deck-value" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              </children>
+                           </GridPane>
+                           
+                           <!-- Tarjeta de Despliegue de Total (Alto Contraste) -->
+                           <VBox spacing="4.0" styleClass="total-display-card">
+                              <children>
+                                 <Label styleClass="total-title" text="TOTAL A PAGAR" />
+                                 <Label fx:id="lblTotal" alignment="CENTER_RIGHT" maxWidth="Infinity" styleClass="total-amount" text="\$ 0.00" />
+                              </children>
+                           </VBox>
+                           
+                           <Separator />
+                           
+                           <!-- Liquidación y Cobro -->
+                           <Label styleClass="deck-section-title" text="LIQUIDACIÓN Y COBRO" />
+                           <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+                              <children>
+                                 <Label styleClass="deck-label" text="Método de Pago:" />
+                                 <ComboBox fx:id="cmbMetodoPago" maxWidth="Infinity" promptText="Seleccionar forma de pago" />
+                                 <GridPane hgap="8.0" vgap="8.0">
+                                   <columnConstraints>
+                                     <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                                     <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="110.0" />
+                                   </columnConstraints>
+                                   <rowConstraints>
+                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                   </rowConstraints>
+                                    <children>
+                                       <Label styleClass="deck-label" text="Paga con ($):" />
+                                       <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" styleClass="font-mono" GridPane.columnIndex="1" />
+                                       <Label text="Cambio:" GridPane.rowIndex="1">
+                                          <font>
+                                             <Font name="System Bold" size="13.0" />
+                                          </font>
+                                       </Label>
+                                       <Label fx:id="lblCambio" styleClass="change-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    </children>
+                                 </GridPane>
+                                 <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Generar Ticket de Venta" />
+                                 <Region VBox.vgrow="ALWAYS" />
+                                 <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="48.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR Y GENERAR TICKET (F12)" wrapText="true" />
+                              </children>
+                           </VBox>
+                        </children>
+                     </VBox>
+                  </right>
               </BorderPane>
             </content>
           </Tab>
@@ -442,20 +423,24 @@
             <Separator />
             <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="status-bar">
                <children>
-                  <Label styleClass="status-shortcut" text="[F1] Ayuda" />
+                  <Label styleClass="status-key" text="F1" />
+                  <Label text="Ayuda" />
                   <Separator orientation="VERTICAL" />
-                  <Label styleClass="status-shortcut" text="[F2] Buscar" />
+                  <Label styleClass="status-key" text="F2" />
+                  <Label text="Buscar" />
                   <Separator orientation="VERTICAL" />
-                  <Label styleClass="status-shortcut" text="[F12] Cobrar" />
+                  <Label styleClass="status-key" text="F12" />
+                  <Label text="Cobrar" />
                   <Separator orientation="VERTICAL" />
-                  <Label styleClass="status-shortcut" text="[Esc] Cancelar" />
+                  <Label styleClass="status-key" text="Esc" />
+                  <Label text="Cancelar" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblAlertaStock" styleClass="status-alert" text="" />
                   <Separator fx:id="sepAlertaStock" orientation="VERTICAL" />
                   <Label fx:id="lblMensajeEstado" styleClass="status-active-tab" text="Pestaña activa: Caja / Ventas" />
                </children>
                <padding>
-                  <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
+                  <Insets bottom="6.0" left="14.0" right="14.0" top="6.0" />
                </padding>
             </HBox>
          </children>
