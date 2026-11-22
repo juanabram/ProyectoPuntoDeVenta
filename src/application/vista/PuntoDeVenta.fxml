@@ -58,9 +58,9 @@
                <children>
                   <Label styleClass="session-title" text="PUNTO DE VENTA" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="Caja: 01" />
+                  <Label text="Caja 01" />
                   <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblSesion" styleClass="session-badge" text="Cajero: Turno Activo" />
+                  <Label fx:id="lblSesion" styleClass="session-badge" text="Cajero Activo" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblFechaHora" text="22/11/2026 | 12:18" />
                </children>
@@ -78,7 +78,7 @@
       <TabPane fx:id="tabPanePrincipal" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
           <!-- ================= PESTAÑA 1: CAJA / VENTAS ================= -->
-          <Tab fx:id="tabVentas" text="Caja / Ventas">
+          <Tab fx:id="tabVentas" text="Ventas">
             <content>
               <BorderPane>
                  <center>
@@ -87,12 +87,12 @@
                           <!-- Barra de Captura Rápida de Artículos (Scanner Hero Area) -->
                            <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="scanner-bar">
                               <children>
-                                 <Label styleClass="scanner-label" text="CÓDIGO / SKU:" />
-                                 <TextField fx:id="txtCodigoBarras" promptText="Escanee código de barras o teclee F2 para buscar..." styleClass="scanner-input" HBox.hgrow="ALWAYS" />
-                                 <Label styleClass="scanner-label" text="CANT:" />
+                                 <Label styleClass="scanner-label" text="Código:" />
+                                 <TextField fx:id="txtCodigoBarras" promptText="Escanear código o teclear [F2]..." styleClass="scanner-input" HBox.hgrow="ALWAYS" />
+                                 <Label styleClass="scanner-label" text="Cant:" />
                                  <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" styleClass="qty-input" text="1" />
-                                 <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar (Enter)" />
-                                 <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Catálogo (F2)" />
+                                 <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar" />
+                                 <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar (F2)" />
                               </children>
                            </HBox>
                           
@@ -112,11 +112,11 @@
                           <!-- Acciones de Carrito -->
                           <HBox alignment="CENTER_LEFT" spacing="10.0">
                              <children>
-                                <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" styleClass="btn-danger-outline" text="Quitar Artículo (Supr)" />
-                                <Button fx:id="btnModificarCantidad" mnemonicParsing="false" styleClass="btn-secondary" text="Modificar Cantidad (F4)" />
-                                <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" styleClass="btn-secondary" text="Aplicar Descuento" />
+                                <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" styleClass="btn-danger-outline" text="Quitar (Supr)" />
+                                <Button fx:id="btnModificarCantidad" mnemonicParsing="false" styleClass="btn-secondary" text="Cantidad (F4)" />
+                                <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" styleClass="btn-secondary" text="Descuento" />
                                 <Region HBox.hgrow="ALWAYS" />
-                                <Button fx:id="btnCancelarVenta" mnemonicParsing="false" styleClass="btn-danger-outline" text="Cancelar Venta (Esc)" />
+                                <Button fx:id="btnCancelarVenta" mnemonicParsing="false" styleClass="btn-danger-outline" text="Cancelar (Esc)" />
                              </children>
                           </HBox>
                        </children>
@@ -131,7 +131,7 @@
                      <VBox prefWidth="340.0" spacing="12.0" styleClass="checkout-deck">
                         <children>
                            <!-- Resumen de Venta -->
-                           <Label styleClass="deck-section-title" text="RESUMEN DE VENTA" />
+                           <Label styleClass="deck-section-title" text="Resumen" />
                            <GridPane hgap="10.0" vgap="7.0">
                              <columnConstraints>
                                <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
@@ -144,7 +144,7 @@
                                <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
                              </rowConstraints>
                               <children>
-                                 <Label styleClass="deck-label" text="Artículos en canasta:" />
+                                 <Label styleClass="deck-label" text="Artículos:" />
                                  <Label fx:id="lblNumArticulos" styleClass="deck-value" text="0" GridPane.columnIndex="1" />
                                  <Label styleClass="deck-label" text="Subtotal:" GridPane.rowIndex="1" />
                                  <Label fx:id="lblSubtotal" styleClass="deck-value" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
@@ -158,7 +158,7 @@
                            <!-- Tarjeta de Despliegue de Total (Alto Contraste) -->
                            <VBox spacing="4.0" styleClass="total-display-card">
                               <children>
-                                 <Label styleClass="total-title" text="TOTAL A PAGAR" />
+                                 <Label styleClass="total-title" text="TOTAL" />
                                  <Label fx:id="lblTotal" alignment="CENTER_RIGHT" maxWidth="Infinity" styleClass="total-amount" text="\$ 0.00" />
                               </children>
                            </VBox>
@@ -166,7 +166,7 @@
                            <Separator />
                            
                            <!-- Liquidación y Cobro -->
-                           <Label styleClass="deck-section-title" text="LIQUIDACIÓN Y COBRO" />
+                           <Label styleClass="deck-section-title" text="Cobro" />
                            <VBox spacing="10.0" VBox.vgrow="ALWAYS">
                               <children>
                                  <Label styleClass="deck-label" text="Método de Pago:" />
@@ -191,9 +191,9 @@
                                        <Label fx:id="lblCambio" styleClass="change-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                     </children>
                                  </GridPane>
-                                 <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Generar Ticket de Venta" />
+                                 <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Imprimir ticket" />
                                  <Region VBox.vgrow="ALWAYS" />
-                                 <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="48.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR Y GENERAR TICKET (F12)" wrapText="true" />
+                                 <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="46.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR (F12)" />
                               </children>
                            </VBox>
                         </children>
@@ -204,7 +204,7 @@
           </Tab>
 
           <!-- ================= PESTAÑA 2: PRODUCTOS Y CATEGORÍAS ================= -->
-          <Tab fx:id="tabProductos" text="Productos y Categorías">
+          <Tab fx:id="tabProductos" text="Productos">
             <content>
               <VBox spacing="10.0">
                  <padding>
@@ -214,26 +214,26 @@
                     <!-- Filtros y Búsqueda de Productos -->
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
-                          <Label text="Buscar Producto:" />
-                          <TextField fx:id="txtBuscarCatalogo" promptText="Buscar por nombre, código o SKU..." HBox.hgrow="ALWAYS" />
+                          <Label text="Buscar:" />
+                          <TextField fx:id="txtBuscarCatalogo" promptText="Buscar por nombre o código..." HBox.hgrow="ALWAYS" />
                           <Label text="Categoría:" />
                           <ComboBox fx:id="cmbFiltroCategoria" prefWidth="180.0" promptText="Todas las categorías" />
                           <Button fx:id="btnFiltrarProductos" mnemonicParsing="false" styleClass="btn-secondary" text="Filtrar" />
-                          <Button fx:id="btnRecargarCatalogo" mnemonicParsing="false" styleClass="btn-secondary" text="Mostrar Todos" />
+                          <Button fx:id="btnRecargarCatalogo" mnemonicParsing="false" styleClass="btn-secondary" text="Limpiar" />
                        </children>
                     </HBox>
                     
                     <!-- Tabla del Catálogo de Productos (Mínimo 400 productos) -->
                     <TableView fx:id="tblCatalogoProductos" VBox.vgrow="ALWAYS">
                       <columns>
-                        <TableColumn fx:id="colCatCodigo" prefWidth="110.0" text="Código / SKU" />
-                        <TableColumn fx:id="colCatNombre" prefWidth="250.0" text="Nombre del Producto" />
-                        <TableColumn fx:id="colCatCategoria" prefWidth="140.0" text="Categoría (20 min)" />
+                        <TableColumn fx:id="colCatCodigo" prefWidth="110.0" text="Código" />
+                        <TableColumn fx:id="colCatNombre" prefWidth="250.0" text="Nombre" />
+                        <TableColumn fx:id="colCatCategoria" prefWidth="140.0" text="Categoría" />
                         <TableColumn fx:id="colCatSubcategoria" prefWidth="140.0" text="Subcategoría" />
-                        <TableColumn fx:id="colCatPrecio" prefWidth="100.0" text="Precio Venta" />
-                        <TableColumn fx:id="colCatStock" prefWidth="80.0" text="Stock Actual" />
-                        <TableColumn fx:id="colCatStockMin" prefWidth="85.0" text="Stock Mínimo" />
-                        <TableColumn fx:id="colCatEstado" prefWidth="100.0" text="Estado (Baja Lógica)" />
+                        <TableColumn fx:id="colCatPrecio" prefWidth="100.0" text="Precio" />
+                        <TableColumn fx:id="colCatStock" prefWidth="80.0" text="Stock" />
+                        <TableColumn fx:id="colCatStockMin" prefWidth="85.0" text="Mínimo" />
+                        <TableColumn fx:id="colCatEstado" prefWidth="100.0" text="Estado" />
                       </columns>
                     </TableView>
                     
@@ -241,13 +241,13 @@
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                        <children>
                           <Button fx:id="btnNuevoProducto" mnemonicParsing="false" styleClass="btn-accent" text="Nuevo Producto" />
-                          <Button fx:id="btnModificarProducto" mnemonicParsing="false" styleClass="btn-secondary" text="Modificar Seleccionado" />
+                          <Button fx:id="btnModificarProducto" mnemonicParsing="false" styleClass="btn-secondary" text="Modificar" />
                           <Button fx:id="btnBajaLogicaProducto" mnemonicParsing="false" styleClass="btn-danger-outline" text="Baja Lógica" />
                           <Separator orientation="VERTICAL" />
-                          <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Categorías (20)" />
-                          <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Imágenes" />
+                          <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" styleClass="btn-secondary" text="Categorías" />
+                          <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" styleClass="btn-secondary" text="Imágenes" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Label fx:id="lblTotalProductosRegistrados" text="Catálogo: 0 productos registrados" />
+                          <Label fx:id="lblTotalProductosRegistrados" text="0 productos" />
                        </children>
                     </HBox>
                  </children>
@@ -256,7 +256,7 @@
           </Tab>
 
           <!-- ================= PESTAÑA 3: INVENTARIO Y STOCK ================= -->
-          <Tab fx:id="tabInventario" text="Inventario y Stock">
+          <Tab fx:id="tabInventario" text="Inventario">
             <content>
               <VBox spacing="10.0">
                  <padding>
@@ -266,11 +266,11 @@
                     <!-- Filtros Rápidos de Inventario -->
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
-                          <Label text="Filtrar Inventario:" />
+                          <Label text="Filtrar:" />
                           <ComboBox fx:id="cmbFiltroInventario" prefWidth="220.0" promptText="Todas las existencias" />
-                          <CheckBox fx:id="chkSoloBajoStock" mnemonicParsing="false" text="Mostrar solo productos con Bajo Stock / Críticos" />
+                          <CheckBox fx:id="chkSoloBajoStock" mnemonicParsing="false" text="Solo bajo stock" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnRefrescarInventario" mnemonicParsing="false" styleClass="btn-secondary" text="Actualizar Existencias" />
+                          <Button fx:id="btnRefrescarInventario" mnemonicParsing="false" styleClass="btn-secondary" text="Actualizar" />
                        </children>
                     </HBox>
                     
@@ -281,8 +281,8 @@
                         <TableColumn fx:id="colInvProducto" prefWidth="280.0" text="Descripción del Producto" />
                         <TableColumn fx:id="colInvCategoria" prefWidth="140.0" text="Categoría" />
                         <TableColumn fx:id="colInvExistencias" prefWidth="100.0" text="Existencias" />
-                        <TableColumn fx:id="colInvStockMinimo" prefWidth="100.0" text="Stock Mínimo" />
-                        <TableColumn fx:id="colInvEstado" prefWidth="120.0" text="Nivel de Alerta" />
+                        <TableColumn fx:id="colInvStockMinimo" prefWidth="100.0" text="Mínimo" />
+                        <TableColumn fx:id="colInvEstado" prefWidth="120.0" text="Alerta" />
                         <TableColumn fx:id="colInvUltimoMovimiento" prefWidth="140.0" text="Último Movimiento" />
                       </columns>
                     </TableView>
@@ -290,11 +290,11 @@
                     <!-- Acciones de Gestión de Inventario -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                        <children>
-                          <Button fx:id="btnEntradaStock" mnemonicParsing="false" styleClass="btn-accent" text="Registrar Entrada (Compra / Recepción)" />
-                          <Button fx:id="btnSalidaStock" mnemonicParsing="false" styleClass="btn-secondary" text="Registrar Salida / Ajuste" />
-                          <Button fx:id="btnAjusteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Ajuste de Existencias" />
+                          <Button fx:id="btnEntradaStock" mnemonicParsing="false" styleClass="btn-accent" text="Entrada Stock" />
+                          <Button fx:id="btnSalidaStock" mnemonicParsing="false" styleClass="btn-secondary" text="Salida Stock" />
+                          <Button fx:id="btnAjusteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Ajuste" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnGenerarReporteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Generar Reporte de Existencias" />
+                          <Button fx:id="btnGenerarReporteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Reporte" />
                        </children>
                     </HBox>
                  </children>
@@ -313,9 +313,9 @@
                     <!-- Búsqueda de Venta Original -->
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
-                          <Label text="Folio de Ticket / Venta:" />
-                          <TextField fx:id="txtFolioDevolucion" promptText="Ingrese número de folio o ticket..." prefWidth="250.0" />
-                          <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar Venta" />
+                          <Label text="Folio / Ticket:" />
+                          <TextField fx:id="txtFolioDevolucion" promptText="Número de folio..." prefWidth="250.0" />
+                          <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar" />
                           <Separator orientation="VERTICAL" />
                           <Label fx:id="lblInfoTicketDevolucion" text="Ticket no consultado" />
                        </children>
@@ -326,9 +326,9 @@
                       <columns>
                         <TableColumn fx:id="colDevCodigo" prefWidth="110.0" text="Código" />
                         <TableColumn fx:id="colDevDescripcion" prefWidth="300.0" text="Descripción del Producto" />
-                        <TableColumn fx:id="colDevPrecio" prefWidth="100.0" text="Precio Venta" />
-                        <TableColumn fx:id="colDevCantComprada" prefWidth="110.0" text="Cant. Comprada" />
-                        <TableColumn fx:id="colDevCantDevolver" prefWidth="110.0" text="Cant. a Devolver" />
+                        <TableColumn fx:id="colDevPrecio" prefWidth="100.0" text="Precio" />
+                        <TableColumn fx:id="colDevCantComprada" prefWidth="110.0" text="Comprada" />
+                        <TableColumn fx:id="colDevCantDevolver" prefWidth="110.0" text="A Devolver" />
                         <TableColumn fx:id="colDevSubtotalReembolso" prefWidth="130.0" text="Reembolso" />
                       </columns>
                     </TableView>
@@ -338,9 +338,9 @@
                        <children>
                           <Label text="Motivo:" />
                           <ComboBox fx:id="cmbMotivoDevolucion" prefWidth="220.0" promptText="Seleccionar motivo" />
-                          <CheckBox fx:id="chkReintegrarStock" mnemonicParsing="false" selected="true" text="Reintegrar productos automáticamente al Inventario" />
+                          <CheckBox fx:id="chkReintegrarStock" mnemonicParsing="false" selected="true" text="Reintegrar a inventario" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnProcesarDevolucion" mnemonicParsing="false" styleClass="btn-accent" text="Procesar Devolución y Emitir Comprobante" />
+                          <Button fx:id="btnProcesarDevolucion" mnemonicParsing="false" styleClass="btn-accent" text="Procesar Devolución" />
                        </children>
                     </HBox>
                  </children>
@@ -349,14 +349,14 @@
           </Tab>
 
           <!-- ================= PESTAÑA 5: REPORTES (JASPERREPORTS) ================= -->
-          <Tab fx:id="tabReportes" text="Reportes (JasperReports)">
+          <Tab fx:id="tabReportes" text="Reportes">
             <content>
               <VBox spacing="12.0">
                  <padding>
                     <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
                  </padding>
                  <children>
-                    <Label text="Centro de Reportes Oficiales (JasperReports .jrxml con Exportación PDF)">
+                    <Label text="Reportes del Sistema">
                        <font>
                           <Font name="System Bold" size="14.0" />
                        </font>
@@ -373,10 +373,10 @@
                         <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
                       </rowConstraints>
                        <children>
-                          <Label text="Seleccionar Reporte:" />
+                          <Label text="Reporte:" />
                           <ComboBox fx:id="cmbTipoReporte" maxWidth="Infinity" promptText="Seleccione el reporte requerido..." GridPane.columnIndex="1" />
                           
-                          <Label text="Rango de Fechas:" GridPane.rowIndex="1" />
+                          <Label text="Rango:" GridPane.rowIndex="1" />
                           <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
                              <children>
                                 <Label text="Desde:" />
@@ -386,7 +386,7 @@
                              </children>
                           </HBox>
                           
-                          <Label text="Filtrar por Categoría:" GridPane.rowIndex="2" />
+                          <Label text="Categoría:" GridPane.rowIndex="2" />
                           <ComboBox fx:id="cmbCategoriaReporte" maxWidth="Infinity" promptText="Todas las categorías" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                        </children>
                     </GridPane>
@@ -395,15 +395,15 @@
                     
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
-                          <Button fx:id="btnVistaPreviaReporte" minHeight="36.0" mnemonicParsing="false" styleClass="btn-secondary" text="Vista Previa en Pantalla" />
-                          <Button fx:id="btnExportarPDF" minHeight="36.0" mnemonicParsing="false" styleClass="btn-accent" text="Exportar a PDF (JasperReports)" />
+                          <Button fx:id="btnVistaPreviaReporte" minHeight="34.0" mnemonicParsing="false" styleClass="btn-secondary" text="Vista Previa" />
+                          <Button fx:id="btnExportarPDF" minHeight="34.0" mnemonicParsing="false" styleClass="btn-accent" text="Exportar PDF" />
                           <Region HBox.hgrow="ALWAYS" />
                           <Label fx:id="lblEstadoReporte" text="Reporte listo para ser generado." />
                        </children>
                     </HBox>
                     
                     <!-- Previsualización / Información del Reporte -->
-                    <TitledPane animated="false" collapsible="false" text="Información y Parámetros del Reporte" VBox.vgrow="ALWAYS">
+                    <TitledPane animated="false" collapsible="false" text="Detalles del Reporte" VBox.vgrow="ALWAYS">
                        <content>
                           <TextArea fx:id="txtDetallesReporte" editable="false" prefRowCount="8" promptText="Los detalles del reporte y parámetros JDBC aparecerán aquí..." wrapText="true" />
                        </content>
