@@ -431,44 +431,6 @@
               </VBox>
             </content>
           </Tab>
-
-          <!-- ================= PESTAÑA 6: ASISTENTE IA ================= -->
-          <Tab fx:id="tabIA" text="Asistente IA">
-            <content>
-              <VBox spacing="12.0">
-                 <padding>
-                    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
-                 </padding>
-                 <children>
-                    <Label text="Módulo de Inteligencia Artificial Aplicada">
-                       <font>
-                          <Font name="System Bold" size="14.0" />
-                       </font>
-                    </Label>
-                    
-                    <HBox alignment="CENTER_LEFT" spacing="12.0">
-                       <children>
-                          <Label text="Funcionalidad Inteligente:" />
-                          <ComboBox fx:id="cmbFuncionIA" prefWidth="280.0" promptText="Seleccionar modelo o función..." />
-                          <Button fx:id="btnEjecutarIA" mnemonicParsing="false" text="Ejecutar Análisis Inteligente" />
-                       </children>
-                    </HBox>
-                    
-                    <TitledPane animated="false" collapsible="false" text="Resultados y Recomendaciones Generadas por IA" VBox.vgrow="ALWAYS">
-                       <content>
-                          <TextArea fx:id="txtResultadoIA" editable="false" prefRowCount="10" promptText="Aquí se mostrarán las sugerencias de reabastecimiento o predicción de demanda generadas por el modelo de IA..." wrapText="true" />
-                       </content>
-                    </TitledPane>
-                    
-                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
-                       <children>
-                          <Button fx:id="btnAplicarRecomendacionIA" mnemonicParsing="false" text="Aplicar Recomendación al Inventario" />
-                       </children>
-                    </HBox>
-                 </children>
-              </VBox>
-            </content>
-          </Tab>
         </tabs>
       </TabPane>
    </center>
