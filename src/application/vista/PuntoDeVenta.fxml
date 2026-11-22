@@ -28,7 +28,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="650.0" minWidth="980.0" prefHeight="740.0" prefWidth="1120.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
+<BorderPane minHeight="650.0" minWidth="980.0" prefHeight="740.0" prefWidth="1120.0" stylesheets="@estilos.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
    <!-- ==================== PARTE SUPERIOR (MENÚ Y DATOS DE SESIÓN) ==================== -->
    <top>
       <VBox BorderPane.alignment="CENTER">
@@ -54,13 +54,13 @@
             </MenuBar>
             
             <!-- Encabezado de Sesión y Terminal -->
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="session-bar">
                <children>
-                  <Label text="Punto de Venta" />
+                  <Label styleClass="session-title" text="PUNTO DE VENTA" />
                   <Separator orientation="VERTICAL" />
                   <Label text="Caja: 01" />
                   <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblSesion" text="Cajero: Turno Activo" />
+                  <Label fx:id="lblSesion" styleClass="session-badge" text="Cajero: Turno Activo" />
                   <Region HBox.hgrow="ALWAYS" />
                   <Label fx:id="lblFechaHora" text="22/11/2026 | 12:18" />
                </children>
@@ -91,8 +91,8 @@
                                 <TextField fx:id="txtCodigoBarras" promptText="Escanee o teclee el código de barras..." HBox.hgrow="ALWAYS" />
                                 <Label text="Cant:" />
                                 <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" text="1" />
-                                <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" text="Agregar (Enter)" />
-                                <Button fx:id="btnBuscar" mnemonicParsing="false" text="Buscar en Catálogo (F2)" />
+                                <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" styleClass="btn-accent" text="Agregar (Enter)" />
+                                <Button fx:id="btnBuscar" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar en Catálogo (F2)" />
                              </children>
                           </HBox>
                           
@@ -112,11 +112,11 @@
                           <!-- Acciones de Carrito -->
                           <HBox alignment="CENTER_LEFT" spacing="10.0">
                              <children>
-                                <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" text="Quitar Artículo (Supr)" />
-                                <Button fx:id="btnModificarCantidad" mnemonicParsing="false" text="Modificar Cantidad (F4)" />
-                                <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" text="Aplicar Descuento" />
+                                <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" styleClass="btn-danger-outline" text="Quitar Artículo (Supr)" />
+                                <Button fx:id="btnModificarCantidad" mnemonicParsing="false" styleClass="btn-secondary" text="Modificar Cantidad (F4)" />
+                                <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" styleClass="btn-secondary" text="Aplicar Descuento" />
                                 <Region HBox.hgrow="ALWAYS" />
-                                <Button fx:id="btnCancelarVenta" mnemonicParsing="false" text="Cancelar Venta (Esc)" />
+                                <Button fx:id="btnCancelarVenta" mnemonicParsing="false" styleClass="btn-danger-outline" text="Cancelar Venta (Esc)" />
                              </children>
                           </HBox>
                        </children>
@@ -128,7 +128,7 @@
                  
                  <!-- Panel Lateral de Totales y Cobro -->
                  <right>
-                    <VBox prefWidth="330.0" spacing="12.0">
+                    <VBox prefWidth="330.0" spacing="12.0" styleClass="side-panel">
                        <children>
                           <!-- Resumen de Venta -->
                           <TitledPane animated="false" collapsible="false" text="Resumen de la Venta">
@@ -161,7 +161,7 @@
                                             <Font name="System Bold" size="16.0" />
                                          </font>
                                       </Label>
-                                      <Label fx:id="lblTotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                      <Label fx:id="lblTotal" styleClass="total-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
                                          <font>
                                             <Font name="System Bold" size="20.0" />
                                          </font>
@@ -195,7 +195,7 @@
                                                   <Font name="System Bold" size="13.0" />
                                                </font>
                                             </Label>
-                                            <Label fx:id="lblCambio" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label fx:id="lblCambio" styleClass="change-amount" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                                <font>
                                                   <Font name="System Bold" size="16.0" />
                                                </font>
@@ -203,7 +203,7 @@
                                          </children>
                                       </GridPane>
                                       <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Generar Ticket de Venta" />
-                                      <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="45.0" mnemonicParsing="false" text="COBRAR Y GENERAR TICKET (F12)">
+                                      <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="48.0" mnemonicParsing="false" styleClass="btn-cobrar" text="COBRAR Y GENERAR TICKET (F12)" wrapText="true">
                                          <font>
                                             <Font name="System Bold" size="13.0" />
                                          </font>
@@ -237,8 +237,8 @@
                           <TextField fx:id="txtBuscarCatalogo" promptText="Buscar por nombre, código o SKU..." HBox.hgrow="ALWAYS" />
                           <Label text="Categoría:" />
                           <ComboBox fx:id="cmbFiltroCategoria" prefWidth="180.0" promptText="Todas las categorías" />
-                          <Button fx:id="btnFiltrarProductos" mnemonicParsing="false" text="Filtrar" />
-                          <Button fx:id="btnRecargarCatalogo" mnemonicParsing="false" text="Mostrar Todos" />
+                          <Button fx:id="btnFiltrarProductos" mnemonicParsing="false" styleClass="btn-secondary" text="Filtrar" />
+                          <Button fx:id="btnRecargarCatalogo" mnemonicParsing="false" styleClass="btn-secondary" text="Mostrar Todos" />
                        </children>
                     </HBox>
                     
@@ -259,12 +259,12 @@
                     <!-- Barra de Acciones del Catálogo -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                        <children>
-                          <Button fx:id="btnNuevoProducto" mnemonicParsing="false" text="Nuevo Producto" />
-                          <Button fx:id="btnModificarProducto" mnemonicParsing="false" text="Modificar Seleccionado" />
-                          <Button fx:id="btnBajaLogicaProducto" mnemonicParsing="false" text="Baja Lógica" />
+                          <Button fx:id="btnNuevoProducto" mnemonicParsing="false" styleClass="btn-accent" text="Nuevo Producto" />
+                          <Button fx:id="btnModificarProducto" mnemonicParsing="false" styleClass="btn-secondary" text="Modificar Seleccionado" />
+                          <Button fx:id="btnBajaLogicaProducto" mnemonicParsing="false" styleClass="btn-danger-outline" text="Baja Lógica" />
                           <Separator orientation="VERTICAL" />
-                          <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" text="Administrar Categorías (20)" />
-                          <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" text="Administrar Imágenes" />
+                          <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Categorías (20)" />
+                          <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Imágenes" />
                           <Region HBox.hgrow="ALWAYS" />
                           <Label fx:id="lblTotalProductosRegistrados" text="Catálogo: 400 productos registrados" />
                        </children>
@@ -289,7 +289,7 @@
                           <ComboBox fx:id="cmbFiltroInventario" prefWidth="220.0" promptText="Todas las existencias" />
                           <CheckBox fx:id="chkSoloBajoStock" mnemonicParsing="false" text="Mostrar solo productos con Bajo Stock / Críticos" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnRefrescarInventario" mnemonicParsing="false" text="Actualizar Existencias" />
+                          <Button fx:id="btnRefrescarInventario" mnemonicParsing="false" styleClass="btn-secondary" text="Actualizar Existencias" />
                        </children>
                     </HBox>
                     
@@ -309,11 +309,11 @@
                     <!-- Acciones de Gestión de Inventario -->
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                        <children>
-                          <Button fx:id="btnEntradaStock" mnemonicParsing="false" text="Registrar Entrada (Compra / Recepción)" />
-                          <Button fx:id="btnSalidaStock" mnemonicParsing="false" text="Registrar Salida / Ajuste" />
-                          <Button fx:id="btnAjusteStock" mnemonicParsing="false" text="Ajuste de Existencias" />
+                          <Button fx:id="btnEntradaStock" mnemonicParsing="false" styleClass="btn-accent" text="Registrar Entrada (Compra / Recepción)" />
+                          <Button fx:id="btnSalidaStock" mnemonicParsing="false" styleClass="btn-secondary" text="Registrar Salida / Ajuste" />
+                          <Button fx:id="btnAjusteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Ajuste de Existencias" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnGenerarReporteStock" mnemonicParsing="false" text="Generar Reporte de Existencias" />
+                          <Button fx:id="btnGenerarReporteStock" mnemonicParsing="false" styleClass="btn-secondary" text="Generar Reporte de Existencias" />
                        </children>
                     </HBox>
                  </children>
@@ -334,7 +334,7 @@
                        <children>
                           <Label text="Folio de Ticket / Venta:" />
                           <TextField fx:id="txtFolioDevolucion" promptText="Ingrese número de folio o ticket..." prefWidth="250.0" />
-                          <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" text="Buscar Venta" />
+                          <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" styleClass="btn-secondary" text="Buscar Venta" />
                           <Separator orientation="VERTICAL" />
                           <Label fx:id="lblInfoTicketDevolucion" text="Ticket no consultado" />
                        </children>
@@ -359,7 +359,7 @@
                           <ComboBox fx:id="cmbMotivoDevolucion" prefWidth="220.0" promptText="Seleccionar motivo" />
                           <CheckBox fx:id="chkReintegrarStock" mnemonicParsing="false" selected="true" text="Reintegrar productos automáticamente al Inventario" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Button fx:id="btnProcesarDevolucion" mnemonicParsing="false" text="Procesar Devolución y Emitir Comprobante" />
+                          <Button fx:id="btnProcesarDevolucion" mnemonicParsing="false" styleClass="btn-accent" text="Procesar Devolución y Emitir Comprobante" />
                        </children>
                     </HBox>
                  </children>
@@ -414,8 +414,8 @@
                     
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                        <children>
-                          <Button fx:id="btnVistaPreviaReporte" minHeight="36.0" mnemonicParsing="false" text="Vista Previa en Pantalla" />
-                          <Button fx:id="btnExportarPDF" minHeight="36.0" mnemonicParsing="false" text="Exportar a PDF (JasperReports)" />
+                          <Button fx:id="btnVistaPreviaReporte" minHeight="36.0" mnemonicParsing="false" styleClass="btn-secondary" text="Vista Previa en Pantalla" />
+                          <Button fx:id="btnExportarPDF" minHeight="36.0" mnemonicParsing="false" styleClass="btn-accent" text="Exportar a PDF (JasperReports)" />
                           <Region HBox.hgrow="ALWAYS" />
                           <Label fx:id="lblEstadoReporte" text="Reporte listo para ser generado." />
                        </children>
@@ -440,19 +440,19 @@
       <VBox BorderPane.alignment="CENTER">
          <children>
             <Separator />
-            <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="status-bar">
                <children>
-                  <Label text="[F1] Ayuda" />
+                  <Label styleClass="status-shortcut" text="[F1] Ayuda" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="[F2] Buscar" />
+                  <Label styleClass="status-shortcut" text="[F2] Buscar" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="[F12] Cobrar" />
+                  <Label styleClass="status-shortcut" text="[F12] Cobrar" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="[Esc] Cancelar" />
+                  <Label styleClass="status-shortcut" text="[Esc] Cancelar" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblAlertaStock" text="[!] Alerta: 2 productos con stock mínimo" />
+                  <Label fx:id="lblAlertaStock" styleClass="status-alert" text="[!] Alerta: 2 productos con stock mínimo" />
                   <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblMensajeEstado" text="Pestaña activa: Caja / Ventas" />
+                  <Label fx:id="lblMensajeEstado" styleClass="status-active-tab" text="Pestaña activa: Caja / Ventas" />
                </children>
                <padding>
                   <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
