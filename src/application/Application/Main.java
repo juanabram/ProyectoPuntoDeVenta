@@ -29,6 +29,7 @@ public class Main extends Application {
 
             // Configurar y desplegar la ventana principal
             Scene scene = new Scene(root);
+            scene.getStylesheets().add(getClass().getResource("/application/vista/estilos.css").toExternalForm());
             primaryStage.setTitle("Punto de Venta - Tienda de Conveniencia");
             primaryStage.setScene(scene);
             primaryStage.setMinWidth(950);
