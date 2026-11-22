@@ -27,27 +27,12 @@ public class VistaControlador {
     @FXML private MenuItem menuNuevaVenta;
     @FXML private MenuItem menuCancelarVenta;
     @FXML private MenuItem menuSalir;
-    
-    @FXML private MenuItem menuNavVentas;
-    @FXML private MenuItem menuNavProductos;
-    @FXML private MenuItem menuNavInventario;
-    @FXML private MenuItem menuNavDevoluciones;
-    @FXML private MenuItem menuNavReportes;
-    @FXML private MenuItem menuNavIA;
-    
     @FXML private MenuItem menuAtajos;
     @FXML private MenuItem menuAcercaDe;
 
     // ==========================================
-    // TOOLBAR DE NAVEGACIÓN
+    // ENCABEZADO DE SESIÓN
     // ==========================================
-    @FXML private Button btnNavVentas;
-    @FXML private Button btnNavProductos;
-    @FXML private Button btnNavInventario;
-    @FXML private Button btnNavDevoluciones;
-    @FXML private Button btnNavReportes;
-    @FXML private Button btnNavIA;
-    
     @FXML private Label lblSesion;
     @FXML private Label lblFechaHora;
 
@@ -195,22 +180,8 @@ public class VistaControlador {
     public MenuItem getMenuCancelarVenta() { return menuCancelarVenta; }
     public MenuItem getMenuSalir() { return menuSalir; }
 
-    public MenuItem getMenuNavVentas() { return menuNavVentas; }
-    public MenuItem getMenuNavProductos() { return menuNavProductos; }
-    public MenuItem getMenuNavInventario() { return menuNavInventario; }
-    public MenuItem getMenuNavDevoluciones() { return menuNavDevoluciones; }
-    public MenuItem getMenuNavReportes() { return menuNavReportes; }
-    public MenuItem getMenuNavIA() { return menuNavIA; }
-
     public MenuItem getMenuAtajos() { return menuAtajos; }
     public MenuItem getMenuAcercaDe() { return menuAcercaDe; }
-
-    public Button getBtnNavVentas() { return btnNavVentas; }
-    public Button getBtnNavProductos() { return btnNavProductos; }
-    public Button getBtnNavInventario() { return btnNavInventario; }
-    public Button getBtnNavDevoluciones() { return btnNavDevoluciones; }
-    public Button getBtnNavReportes() { return btnNavReportes; }
-    public Button getBtnNavIA() { return btnNavIA; }
 
     public Label getLblSesion() { return lblSesion; }
     public Label getLblFechaHora() { return lblFechaHora; }

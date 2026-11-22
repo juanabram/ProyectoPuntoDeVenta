@@ -32,25 +32,9 @@ public class Controlador {
     }
 
     /**
-     * Configura la navegación real entre pestañas mediante el TabPane, los botones y el menú.
+     * Configura la navegación y respuesta al alternar entre pestañas del TabPane.
      */
     private void inicializarNavegacionPestanas() {
-        // Enlazar botones de la ToolBar directamente con la selección de pestañas
-        vista.getBtnNavVentas().setOnAction(e -> seleccionarPestana(vista.getTabVentas()));
-        vista.getBtnNavProductos().setOnAction(e -> seleccionarPestana(vista.getTabProductos()));
-        vista.getBtnNavInventario().setOnAction(e -> seleccionarPestana(vista.getTabInventario()));
-        vista.getBtnNavDevoluciones().setOnAction(e -> seleccionarPestana(vista.getTabDevoluciones()));
-        vista.getBtnNavReportes().setOnAction(e -> seleccionarPestana(vista.getTabReportes()));
-        vista.getBtnNavIA().setOnAction(e -> seleccionarPestana(vista.getTabIA()));
-
-        // Enlazar opciones del menú superior con la selección de pestañas
-        vista.getMenuNavVentas().setOnAction(e -> seleccionarPestana(vista.getTabVentas()));
-        vista.getMenuNavProductos().setOnAction(e -> seleccionarPestana(vista.getTabProductos()));
-        vista.getMenuNavInventario().setOnAction(e -> seleccionarPestana(vista.getTabInventario()));
-        vista.getMenuNavDevoluciones().setOnAction(e -> seleccionarPestana(vista.getTabDevoluciones()));
-        vista.getMenuNavReportes().setOnAction(e -> seleccionarPestana(vista.getTabReportes()));
-        vista.getMenuNavIA().setOnAction(e -> seleccionarPestana(vista.getTabIA()));
-
         // Listener para detectar el cambio de pestaña (cuando el usuario hace clic directo en las pestañas)
         vista.getTabPanePrincipal().getSelectionModel().selectedItemProperty().addListener((obs, anteriorTab, nuevaTab) -> {
             if (nuevaTab != null) {
