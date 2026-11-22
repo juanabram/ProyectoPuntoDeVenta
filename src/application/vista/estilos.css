@@ -452,6 +452,13 @@
     -fx-alignment: CENTER_LEFT;
 }
 
+/* Estado vacío de la tabla (Polish) */
+.table-view .placeholder .label {
+    -fx-text-fill: #8E826C;
+    -fx-font-size: 13px;
+    -fx-font-style: italic;
+}
+
 /* Celdas numéricas con alineación derecha y tipografía monospace */
 .col-numeric {
     -fx-alignment: CENTER_RIGHT;
@@ -718,4 +725,25 @@
 .scroll-bar .decrement-button {
     -fx-background-color: transparent;
     -fx-padding: 0;
+}
+
+/* ==========================================================================
+   15. VARIANTE DE ALTO CONTRASTE / TURNO NOCTURNO (POLISH / THEMING)
+   ========================================================================== */
+.theme-dark {
+    -color-canvas: #151515;
+    -color-canvas-alt: #1E1E1E;
+    -color-surface-light: #242424;
+    -color-border-subtle: #333333;
+    -color-border-strong: #444444;
+
+    -color-obsidian: #0D0D0D;
+    -color-obsidian-card: #181818;
+    -color-text-dark: #EEE3CC;
+    -color-text-light: #FFFFFF;
+
+    -fx-base: #151515;
+    -fx-background: #151515;
+    -fx-background-color: #151515;
+    -fx-text-fill: #EEE3CC;
 }
