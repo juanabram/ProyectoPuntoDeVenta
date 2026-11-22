@@ -131,8 +131,17 @@ public class Controlador {
         vista.getCmbCategoriaReporte().setItems(vista.getCmbFiltroCategoria().getItems());
         vista.getCmbCategoriaReporte().getSelectionModel().selectFirst();
 
+        // Enlace reactivo para alerta de stock: solo visible cuando exista un texto de alerta
+        vista.getLblAlertaStock().visibleProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
+        vista.getLblAlertaStock().managedProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
+        if (vista.getSepAlertaStock() != null) {
+            vista.getSepAlertaStock().visibleProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
+            vista.getSepAlertaStock().managedProperty().bind(vista.getLblAlertaStock().textProperty().isNotEmpty());
+        }
+
         // Estado inicial
-        vista.getLblAlertaStock().setText("[!] Alerta: 2 productos con stock mínimo");
+        actualizarAlertaStock();
+        actualizarContadorCatalogo();
         vista.getLblMensajeEstado().setText("Pestaña activa: Caja / Ventas");
         Platform.runLater(() -> vista.getTxtCodigoBarras().requestFocus());
     }
@@ -215,7 +224,8 @@ public class Controlador {
         vista.getBtnRecargarCatalogo().setOnAction(e -> {
             vista.getTxtBuscarCatalogo().clear();
             vista.getCmbFiltroCategoria().getSelectionModel().selectFirst();
-            vista.getLblMensajeEstado().setText("Catálogo completo mostrado (400 productos registrados).");
+            actualizarContadorCatalogo();
+            vista.getLblMensajeEstado().setText("Catálogo completo mostrado.");
         });
 
         vista.getBtnNuevoProducto().setOnAction(e -> {
@@ -257,6 +267,7 @@ public class Controlador {
         });
 
         vista.getBtnRefrescarInventario().setOnAction(e -> {
+            actualizarAlertaStock();
             vista.getLblMensajeEstado().setText("Existencias de inventario sincronizadas correctamente.");
         });
 
@@ -329,6 +340,29 @@ public class Controlador {
                 "Generando archivo PDF con logotipo y fecha/hora: '" + rep + ".pdf'.", AlertType.INFORMATION);
             vista.getLblEstadoReporte().setText("Archivo PDF exportado exitosamente.");
         });
+    }
+
+    /**
+     * Evalúa y actualiza la alerta de stock en la barra de estado.
+     * Solo muestra alerta si existen productos cuyo stock actual sea menor o igual al mínimo.
+     * Al no haber productos activos o críticos, permanece oculta sin generar falsas alertas.
+     */
+    private void actualizarAlertaStock() {
+        // En la fase de integración con base de datos, contará registros con stock <= stock_minimo
+        int countCriticos = 0;
+        if (countCriticos > 0) {
+            vista.getLblAlertaStock().setText("[!] Alerta: " + countCriticos + " producto(s) con stock crítico");
+        } else {
+            vista.getLblAlertaStock().setText("");
+        }
+    }
+
+    /**
+     * Actualiza el contador de productos del catálogo según los registros activos.
+     */
+    private void actualizarContadorCatalogo() {
+        int total = vista.getTblCatalogoProductos().getItems().size();
+        vista.getLblTotalProductosRegistrados().setText("Catálogo: " + total + " productos registrados");
     }
 
     private void limpiarCamposVenta() {

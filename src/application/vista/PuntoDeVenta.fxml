@@ -266,7 +266,7 @@
                           <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Categorías (20)" />
                           <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" styleClass="btn-secondary" text="Administrar Imágenes" />
                           <Region HBox.hgrow="ALWAYS" />
-                          <Label fx:id="lblTotalProductosRegistrados" text="Catálogo: 400 productos registrados" />
+                          <Label fx:id="lblTotalProductosRegistrados" text="Catálogo: 0 productos registrados" />
                        </children>
                     </HBox>
                  </children>
@@ -450,8 +450,8 @@
                   <Separator orientation="VERTICAL" />
                   <Label styleClass="status-shortcut" text="[Esc] Cancelar" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblAlertaStock" styleClass="status-alert" text="[!] Alerta: 2 productos con stock mínimo" />
-                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblAlertaStock" styleClass="status-alert" text="" />
+                  <Separator fx:id="sepAlertaStock" orientation="VERTICAL" />
                   <Label fx:id="lblMensajeEstado" styleClass="status-active-tab" text="Pestaña activa: Caja / Ventas" />
                </children>
                <padding>
