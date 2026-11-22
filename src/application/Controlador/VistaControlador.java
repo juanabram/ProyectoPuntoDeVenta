@@ -7,6 +7,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
@@ -161,6 +162,7 @@ public class VistaControlador {
     // BARRA INFERIOR (ESTADO Y ALERTAS)
     // ==========================================
     @FXML private Label lblAlertaStock;
+    @FXML private Separator sepAlertaStock;
     @FXML private Label lblMensajeEstado;
 
     // ==========================================
@@ -260,5 +262,6 @@ public class VistaControlador {
 
     // Barra inferior
     public Label getLblAlertaStock() { return lblAlertaStock; }
+    public Separator getSepAlertaStock() { return sepAlertaStock; }
     public Label getLblMensajeEstado() { return lblMensajeEstado; }
 }
