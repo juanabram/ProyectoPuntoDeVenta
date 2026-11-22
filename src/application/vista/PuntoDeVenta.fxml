@@ -4,16 +4,21 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -23,299 +28,480 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane minHeight="600.0" minWidth="900.0" prefHeight="720.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
-   <!-- ==================== PARTE SUPERIOR (MENÚ Y DATOS DE SESIÓN) ==================== -->
+<BorderPane minHeight="650.0" minWidth="980.0" prefHeight="740.0" prefWidth="1120.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.Controlador.VistaControlador">
+   <!-- ==================== PARTE SUPERIOR (MENÚ Y ACCESOS A PESTAÑAS) ==================== -->
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <!-- Barra de Menús Principal -->
+            <!-- Barra de Menús del Sistema -->
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="Venta">
+                <Menu mnemonicParsing="false" text="Sistema">
                   <items>
                     <MenuItem fx:id="menuNuevaVenta" mnemonicParsing="false" text="Nueva Venta (Ctrl+N)" />
-                    <MenuItem fx:id="menuPonerEnEspera" mnemonicParsing="false" text="Poner Venta en Espera (F7)" />
-                    <MenuItem fx:id="menuRecuperarVenta" mnemonicParsing="false" text="Recuperar Venta Pendiente" />
-                    <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="menuCancelarVenta" mnemonicParsing="false" text="Cancelar Venta Actual (Esc)" />
                     <SeparatorMenuItem mnemonicParsing="false" />
                     <MenuItem fx:id="menuSalir" mnemonicParsing="false" text="Salir del Sistema" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Operaciones de Caja">
+                <Menu mnemonicParsing="false" text="Pestañas / Módulos">
                   <items>
-                    <MenuItem fx:id="menuEntradaEfectivo" mnemonicParsing="false" text="Entrada de Efectivo..." />
-                    <MenuItem fx:id="menuSalidaEfectivo" mnemonicParsing="false" text="Salida / Retiro de Efectivo..." />
+                    <MenuItem fx:id="menuNavVentas" mnemonicParsing="false" text="Caja / Ventas" />
+                    <MenuItem fx:id="menuNavProductos" mnemonicParsing="false" text="Gestión de Productos y Categorías" />
+                    <MenuItem fx:id="menuNavInventario" mnemonicParsing="false" text="Gestión de Inventario y Existencias" />
+                    <MenuItem fx:id="menuNavDevoluciones" mnemonicParsing="false" text="Gestión de Devoluciones" />
+                    <MenuItem fx:id="menuNavReportes" mnemonicParsing="false" text="Reportes JasperReports" />
                     <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem fx:id="menuCorteX" mnemonicParsing="false" text="Corte Parcial (Corte X)" />
-                    <MenuItem fx:id="menuCorteZ" mnemonicParsing="false" text="Corte del Día / Cierre de Turno (Corte Z)" />
-                    <SeparatorMenuItem mnemonicParsing="false" />
-                    <MenuItem fx:id="menuHistorialVentas" mnemonicParsing="false" text="Historial de Ventas del Día" />
-                    <MenuItem fx:id="menuDevoluciones" mnemonicParsing="false" text="Devolución de Producto" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Catálogo">
-                  <items>
-                    <MenuItem fx:id="menuBuscarProducto" mnemonicParsing="false" text="Buscar Producto en Catálogo (F2)" />
-                    <MenuItem fx:id="menuListaPrecios" mnemonicParsing="false" text="Consultar Precios" />
-                    <MenuItem fx:id="menuPromociones" mnemonicParsing="false" text="Promociones y Ofertas Activas" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Servicios">
-                  <items>
-                    <MenuItem fx:id="menuRecargas" mnemonicParsing="false" text="Recargas Electrónicas (F5)" />
-                    <MenuItem fx:id="menuPagoServicios" mnemonicParsing="false" text="Pago de Servicios (Luz, Agua, Gas, etc.) (F6)" />
-                    <MenuItem fx:id="menuPines" mnemonicParsing="false" text="Tarjetas de Regalo / Pines Digitales" />
-                    <MenuItem fx:id="menuDepositos" mnemonicParsing="false" text="Depósitos / Envíos de Dinero" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Configuración">
-                  <items>
-                    <MenuItem fx:id="menuAjustesCaja" mnemonicParsing="false" text="Ajustes de Terminal" />
-                    <MenuItem fx:id="menuImpresora" mnemonicParsing="false" text="Configuración de Ticket / Impresora" />
+                    <MenuItem fx:id="menuNavIA" mnemonicParsing="false" text="Asistente de IA (Predicción / Demanda)" />
                   </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Ayuda">
                   <items>
-                    <MenuItem fx:id="menuAtajos" mnemonicParsing="false" text="Guía de Atajos de Teclado (F1)" />
-                    <MenuItem fx:id="menuAcercaDe" mnemonicParsing="false" text="Acerca del Punto de Venta" />
+                    <MenuItem fx:id="menuAtajos" mnemonicParsing="false" text="Atajos de Teclado (F1)" />
+                    <MenuItem fx:id="menuAcercaDe" mnemonicParsing="false" text="Acerca del Proyecto Integrador" />
                   </items>
                 </Menu>
               </menus>
             </MenuBar>
             
-            <!-- Barra de Información de Sucursal y Cajero -->
-            <HBox alignment="CENTER_LEFT" spacing="15.0">
-               <children>
-                  <Label text="Tienda: Tienda Express - Sucursal Centro" />
+            <!-- Barra Superior de Navegación Rápida -->
+            <ToolBar>
+               <items>
+                  <Button fx:id="btnNavVentas" mnemonicParsing="false" text="Caja / Ventas" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="Caja: 01" />
-                  <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblCajero" text="Cajero: Juan Pérez (Turno Matutino)" />
-                  <Separator orientation="VERTICAL" />
-                  <Label fx:id="lblEstadoCaja" text="Estado: En Servicio" />
+                  <Button fx:id="btnNavProductos" mnemonicParsing="false" text="Productos y Categorías" />
+                  <Button fx:id="btnNavInventario" mnemonicParsing="false" text="Inventario y Stock" />
+                  <Button fx:id="btnNavDevoluciones" mnemonicParsing="false" text="Devoluciones" />
+                  <Button fx:id="btnNavReportes" mnemonicParsing="false" text="Reportes (JasperReports)" />
+                  <Button fx:id="btnNavIA" mnemonicParsing="false" text="Asistente IA" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblFechaHora" text="Fecha: 13/11/2026 | Hora: 23:00" />
-               </children>
-               <padding>
-                  <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
-               </padding>
-            </HBox>
-            <Separator />
+                  <Label fx:id="lblSesion" text="Caja 01 | Cajero: Turno Activo" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblFechaHora" text="13/11/2026 | 23:00" />
+               </items>
+            </ToolBar>
          </children>
       </VBox>
    </top>
 
-   <!-- ==================== CENTRO (CAPTURA DE PRODUCTOS Y TABLA DE VENTA) ==================== -->
+   <!-- ==================== CENTRO: CONTENEDOR MULTI-PESTAÑA (TABPANE) ==================== -->
    <center>
-      <VBox spacing="10.0" BorderPane.alignment="CENTER">
-         <children>
-            <!-- Barra de Captura Rápida de Artículos -->
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
-               <children>
-                  <Label text="Código de Barras:" />
-                  <TextField fx:id="txtCodigoBarras" promptText="Escanee o ingrese código de barras..." HBox.hgrow="ALWAYS" />
-                  <Label text="Cantidad:" />
-                  <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" text="1" />
-                  <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" text="Agregar (Enter)" />
-                  <Button fx:id="btnBuscar" mnemonicParsing="false" text="Buscar Producto (F2)" />
-               </children>
-            </HBox>
-            
-            <!-- Tabla Principal del Carrito de Venta -->
-            <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
-              <columns>
-                <TableColumn fx:id="colNumero" prefWidth="40.0" text="#" />
-                <TableColumn fx:id="colCodigo" prefWidth="130.0" text="Código" />
-                <TableColumn fx:id="colDescripcion" prefWidth="280.0" text="Descripción del Producto" />
-                <TableColumn fx:id="colPrecio" prefWidth="95.0" text="Precio Unit." />
-                <TableColumn fx:id="colCantidad" prefWidth="70.0" text="Cantidad" />
-                <TableColumn fx:id="colUnidad" prefWidth="75.0" text="Unidad" />
-                <TableColumn fx:id="colDescuento" prefWidth="90.0" text="Descuento" />
-                <TableColumn fx:id="colImporte" prefWidth="110.0" text="Importe" />
-              </columns>
-            </TableView>
-            
-            <!-- Barra de Botones de Acción para la Tabla -->
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
-               <children>
-                  <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" text="Eliminar Artículo (Supr)" />
-                  <Button fx:id="btnModificarCantidad" mnemonicParsing="false" text="Modificar Cantidad (F4)" />
-                  <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" text="Aplicar Descuento / Cupón" />
-                  <Button fx:id="btnPonerEnEspera" mnemonicParsing="false" text="Venta en Espera (F7)" />
-                  <Button fx:id="btnRecuperarVenta" mnemonicParsing="false" text="Recuperar Venta" />
-                  <Region HBox.hgrow="ALWAYS" />
-                  <Button fx:id="btnCancelarVenta" mnemonicParsing="false" text="Cancelar Venta (Esc)" />
-               </children>
-            </HBox>
-         </children>
-         <padding>
-            <Insets bottom="10.0" left="12.0" right="8.0" top="10.0" />
-         </padding>
-      </VBox>
+      <TabPane fx:id="tabPanePrincipal" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+        <tabs>
+          <!-- ================= PESTAÑA 1: CAJA / VENTAS ================= -->
+          <Tab fx:id="tabVentas" text="Caja / Ventas">
+            <content>
+              <BorderPane>
+                 <center>
+                    <VBox spacing="10.0">
+                       <children>
+                          <!-- Barra de Captura Rápida de Artículos -->
+                          <HBox alignment="CENTER_LEFT" spacing="10.0">
+                             <children>
+                                <Label text="Código de Barras:" />
+                                <TextField fx:id="txtCodigoBarras" promptText="Escanee o teclee el código de barras..." HBox.hgrow="ALWAYS" />
+                                <Label text="Cant:" />
+                                <TextField fx:id="txtCantidad" alignment="CENTER" prefWidth="60.0" text="1" />
+                                <Button fx:id="btnAgregar" defaultButton="true" mnemonicParsing="false" text="Agregar (Enter)" />
+                                <Button fx:id="btnBuscar" mnemonicParsing="false" text="Buscar en Catálogo (F2)" />
+                             </children>
+                          </HBox>
+                          
+                          <!-- Tabla de Ventas -->
+                          <TableView fx:id="tblProductos" VBox.vgrow="ALWAYS">
+                            <columns>
+                              <TableColumn fx:id="colNumero" prefWidth="40.0" text="#" />
+                              <TableColumn fx:id="colCodigo" prefWidth="130.0" text="Código" />
+                              <TableColumn fx:id="colDescripcion" prefWidth="290.0" text="Descripción del Producto" />
+                              <TableColumn fx:id="colPrecio" prefWidth="100.0" text="Precio Unit." />
+                              <TableColumn fx:id="colCantidad" prefWidth="75.0" text="Cantidad" />
+                              <TableColumn fx:id="colDescuento" prefWidth="90.0" text="Descuento" />
+                              <TableColumn fx:id="colImporte" prefWidth="110.0" text="Subtotal" />
+                            </columns>
+                          </TableView>
+                          
+                          <!-- Acciones de Carrito -->
+                          <HBox alignment="CENTER_LEFT" spacing="10.0">
+                             <children>
+                                <Button fx:id="btnEliminarArticulo" mnemonicParsing="false" text="Quitar Artículo (Supr)" />
+                                <Button fx:id="btnModificarCantidad" mnemonicParsing="false" text="Modificar Cantidad (F4)" />
+                                <Button fx:id="btnAplicarDescuento" mnemonicParsing="false" text="Aplicar Descuento" />
+                                <Region HBox.hgrow="ALWAYS" />
+                                <Button fx:id="btnCancelarVenta" mnemonicParsing="false" text="Cancelar Venta (Esc)" />
+                             </children>
+                          </HBox>
+                       </children>
+                       <padding>
+                          <Insets bottom="10.0" left="12.0" right="8.0" top="10.0" />
+                       </padding>
+                    </VBox>
+                 </center>
+                 
+                 <!-- Panel Lateral de Totales y Cobro -->
+                 <right>
+                    <VBox prefWidth="330.0" spacing="12.0">
+                       <children>
+                          <!-- Resumen de Venta -->
+                          <TitledPane animated="false" collapsible="false" text="Resumen de la Venta">
+                             <content>
+                                <GridPane hgap="10.0" vgap="8.0">
+                                  <columnConstraints>
+                                    <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                                    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
+                                  </columnConstraints>
+                                  <rowConstraints>
+                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="24.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="6.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                                  </rowConstraints>
+                                   <children>
+                                      <Label text="Artículos en canasta:" />
+                                      <Label fx:id="lblNumArticulos" text="0" GridPane.columnIndex="1" />
+                                      <Label text="Subtotal:" GridPane.rowIndex="1" />
+                                      <Label fx:id="lblSubtotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                      <Label text="Descuentos:" GridPane.rowIndex="2" />
+                                      <Label fx:id="lblDescuento" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                      <Label text="IVA (16%):" GridPane.rowIndex="3" />
+                                      <Label fx:id="lblIva" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                      <Separator GridPane.columnSpan="2" GridPane.rowIndex="4" />
+                                      <Label text="TOTAL A PAGAR:" GridPane.rowIndex="5">
+                                         <font>
+                                            <Font name="System Bold" size="16.0" />
+                                         </font>
+                                      </Label>
+                                      <Label fx:id="lblTotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                         <font>
+                                            <Font name="System Bold" size="20.0" />
+                                         </font>
+                                      </Label>
+                                   </children>
+                                </GridPane>
+                             </content>
+                          </TitledPane>
+
+                          <!-- Cobro y Liquidación -->
+                          <TitledPane animated="false" collapsible="false" text="Liquidación y Cobro" VBox.vgrow="ALWAYS">
+                             <content>
+                                <VBox spacing="10.0">
+                                   <children>
+                                      <Label text="Método de Pago:" />
+                                      <ComboBox fx:id="cmbMetodoPago" maxWidth="Infinity" promptText="Seleccionar forma de pago" />
+                                      <GridPane hgap="8.0" vgap="8.0">
+                                        <columnConstraints>
+                                          <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
+                                          <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
+                                        </columnConstraints>
+                                        <rowConstraints>
+                                          <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                                          <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
+                                        </rowConstraints>
+                                         <children>
+                                            <Label text="Paga con ($):" />
+                                            <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="1" />
+                                            <Label text="Cambio:" GridPane.rowIndex="1">
+                                               <font>
+                                                  <Font name="System Bold" size="13.0" />
+                                               </font>
+                                            </Label>
+                                            <Label fx:id="lblCambio" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                               <font>
+                                                  <Font name="System Bold" size="16.0" />
+                                               </font>
+                                            </Label>
+                                         </children>
+                                      </GridPane>
+                                      <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Generar Ticket de Venta" />
+                                      <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="45.0" mnemonicParsing="false" text="COBRAR Y GENERAR TICKET (F12)">
+                                         <font>
+                                            <Font name="System Bold" size="13.0" />
+                                         </font>
+                                      </Button>
+                                   </children>
+                                </VBox>
+                             </content>
+                          </TitledPane>
+                       </children>
+                       <padding>
+                          <Insets bottom="10.0" left="8.0" right="12.0" top="10.0" />
+                       </padding>
+                    </VBox>
+                 </right>
+              </BorderPane>
+            </content>
+          </Tab>
+
+          <!-- ================= PESTAÑA 2: PRODUCTOS Y CATEGORÍAS ================= -->
+          <Tab fx:id="tabProductos" text="Productos y Categorías">
+            <content>
+              <VBox spacing="10.0">
+                 <padding>
+                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                 </padding>
+                 <children>
+                    <!-- Filtros y Búsqueda de Productos -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                       <children>
+                          <Label text="Buscar Producto:" />
+                          <TextField fx:id="txtBuscarCatalogo" promptText="Buscar por nombre, código o SKU..." HBox.hgrow="ALWAYS" />
+                          <Label text="Categoría:" />
+                          <ComboBox fx:id="cmbFiltroCategoria" prefWidth="180.0" promptText="Todas las categorías" />
+                          <Button fx:id="btnFiltrarProductos" mnemonicParsing="false" text="Filtrar" />
+                          <Button fx:id="btnRecargarCatalogo" mnemonicParsing="false" text="Mostrar Todos" />
+                       </children>
+                    </HBox>
+                    
+                    <!-- Tabla del Catálogo de Productos (Mínimo 400 productos) -->
+                    <TableView fx:id="tblCatalogoProductos" VBox.vgrow="ALWAYS">
+                      <columns>
+                        <TableColumn fx:id="colCatCodigo" prefWidth="110.0" text="Código / SKU" />
+                        <TableColumn fx:id="colCatNombre" prefWidth="250.0" text="Nombre del Producto" />
+                        <TableColumn fx:id="colCatCategoria" prefWidth="140.0" text="Categoría (20 min)" />
+                        <TableColumn fx:id="colCatSubcategoria" prefWidth="140.0" text="Subcategoría" />
+                        <TableColumn fx:id="colCatPrecio" prefWidth="100.0" text="Precio Venta" />
+                        <TableColumn fx:id="colCatStock" prefWidth="80.0" text="Stock Actual" />
+                        <TableColumn fx:id="colCatStockMin" prefWidth="85.0" text="Stock Mínimo" />
+                        <TableColumn fx:id="colCatEstado" prefWidth="100.0" text="Estado (Baja Lógica)" />
+                      </columns>
+                    </TableView>
+                    
+                    <!-- Barra de Acciones del Catálogo -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                       <children>
+                          <Button fx:id="btnNuevoProducto" mnemonicParsing="false" text="Nuevo Producto" />
+                          <Button fx:id="btnModificarProducto" mnemonicParsing="false" text="Modificar Seleccionado" />
+                          <Button fx:id="btnBajaLogicaProducto" mnemonicParsing="false" text="Baja Lógica" />
+                          <Separator orientation="VERTICAL" />
+                          <Button fx:id="btnAdministrarCategorias" mnemonicParsing="false" text="Administrar Categorías (20)" />
+                          <Button fx:id="btnAdministrarImagenes" mnemonicParsing="false" text="Administrar Imágenes" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Label fx:id="lblTotalProductosRegistrados" text="Catálogo: 400 productos registrados" />
+                       </children>
+                    </HBox>
+                 </children>
+              </VBox>
+            </content>
+          </Tab>
+
+          <!-- ================= PESTAÑA 3: INVENTARIO Y STOCK ================= -->
+          <Tab fx:id="tabInventario" text="Inventario y Stock">
+            <content>
+              <VBox spacing="10.0">
+                 <padding>
+                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                 </padding>
+                 <children>
+                    <!-- Filtros Rápidos de Inventario -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                       <children>
+                          <Label text="Filtrar Inventario:" />
+                          <ComboBox fx:id="cmbFiltroInventario" prefWidth="220.0" promptText="Todas las existencias" />
+                          <CheckBox fx:id="chkSoloBajoStock" mnemonicParsing="false" text="Mostrar solo productos con Bajo Stock / Críticos" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Button fx:id="btnRefrescarInventario" mnemonicParsing="false" text="Actualizar Existencias" />
+                       </children>
+                    </HBox>
+                    
+                    <!-- Tabla de Control de Inventario -->
+                    <TableView fx:id="tblInventario" VBox.vgrow="ALWAYS">
+                      <columns>
+                        <TableColumn fx:id="colInvCodigo" prefWidth="110.0" text="Código" />
+                        <TableColumn fx:id="colInvProducto" prefWidth="280.0" text="Descripción del Producto" />
+                        <TableColumn fx:id="colInvCategoria" prefWidth="140.0" text="Categoría" />
+                        <TableColumn fx:id="colInvExistencias" prefWidth="100.0" text="Existencias" />
+                        <TableColumn fx:id="colInvStockMinimo" prefWidth="100.0" text="Stock Mínimo" />
+                        <TableColumn fx:id="colInvEstado" prefWidth="120.0" text="Nivel de Alerta" />
+                        <TableColumn fx:id="colInvUltimoMovimiento" prefWidth="140.0" text="Último Movimiento" />
+                      </columns>
+                    </TableView>
+                    
+                    <!-- Acciones de Gestión de Inventario -->
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                       <children>
+                          <Button fx:id="btnEntradaStock" mnemonicParsing="false" text="Registrar Entrada (Compra / Recepción)" />
+                          <Button fx:id="btnSalidaStock" mnemonicParsing="false" text="Registrar Salida / Ajuste" />
+                          <Button fx:id="btnAjusteStock" mnemonicParsing="false" text="Ajuste de Existencias" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Button fx:id="btnGenerarReporteStock" mnemonicParsing="false" text="Generar Reporte de Existencias" />
+                       </children>
+                    </HBox>
+                 </children>
+              </VBox>
+            </content>
+          </Tab>
+
+          <!-- ================= PESTAÑA 4: DEVOLUCIONES ================= -->
+          <Tab fx:id="tabDevoluciones" text="Devoluciones">
+            <content>
+              <VBox spacing="10.0">
+                 <padding>
+                    <Insets bottom="12.0" left="12.0" right="12.0" top="12.0" />
+                 </padding>
+                 <children>
+                    <!-- Búsqueda de Venta Original -->
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                       <children>
+                          <Label text="Folio de Ticket / Venta:" />
+                          <TextField fx:id="txtFolioDevolucion" promptText="Ingrese número de folio o ticket..." prefWidth="250.0" />
+                          <Button fx:id="btnBuscarTicketDevolucion" mnemonicParsing="false" text="Buscar Venta" />
+                          <Separator orientation="VERTICAL" />
+                          <Label fx:id="lblInfoTicketDevolucion" text="Ticket no consultado" />
+                       </children>
+                    </HBox>
+                    
+                    <!-- Tabla de Productos de la Venta a Devolver -->
+                    <TableView fx:id="tblDevoluciones" VBox.vgrow="ALWAYS">
+                      <columns>
+                        <TableColumn fx:id="colDevCodigo" prefWidth="110.0" text="Código" />
+                        <TableColumn fx:id="colDevDescripcion" prefWidth="300.0" text="Descripción del Producto" />
+                        <TableColumn fx:id="colDevPrecio" prefWidth="100.0" text="Precio Venta" />
+                        <TableColumn fx:id="colDevCantComprada" prefWidth="110.0" text="Cant. Comprada" />
+                        <TableColumn fx:id="colDevCantDevolver" prefWidth="110.0" text="Cant. a Devolver" />
+                        <TableColumn fx:id="colDevSubtotalReembolso" prefWidth="130.0" text="Reembolso" />
+                      </columns>
+                    </TableView>
+                    
+                    <!-- Opciones de Devolución -->
+                    <HBox alignment="CENTER_LEFT" spacing="15.0">
+                       <children>
+                          <Label text="Motivo:" />
+                          <ComboBox fx:id="cmbMotivoDevolucion" prefWidth="220.0" promptText="Seleccionar motivo" />
+                          <CheckBox fx:id="chkReintegrarStock" mnemonicParsing="false" selected="true" text="Reintegrar productos automáticamente al Inventario" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Button fx:id="btnProcesarDevolucion" mnemonicParsing="false" text="Procesar Devolución y Emitir Comprobante" />
+                       </children>
+                    </HBox>
+                 </children>
+              </VBox>
+            </content>
+          </Tab>
+
+          <!-- ================= PESTAÑA 5: REPORTES (JASPERREPORTS) ================= -->
+          <Tab fx:id="tabReportes" text="Reportes (JasperReports)">
+            <content>
+              <VBox spacing="12.0">
+                 <padding>
+                    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+                 </padding>
+                 <children>
+                    <Label text="Centro de Reportes Oficiales (JasperReports .jrxml con Exportación PDF)">
+                       <font>
+                          <Font name="System Bold" size="14.0" />
+                       </font>
+                    </Label>
+                    
+                    <GridPane hgap="12.0" vgap="12.0">
+                      <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" minWidth="130.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                      </columnConstraints>
+                      <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                        <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
+                      </rowConstraints>
+                       <children>
+                          <Label text="Seleccionar Reporte:" />
+                          <ComboBox fx:id="cmbTipoReporte" maxWidth="Infinity" promptText="Seleccione el reporte requerido..." GridPane.columnIndex="1" />
+                          
+                          <Label text="Rango de Fechas:" GridPane.rowIndex="1" />
+                          <HBox alignment="CENTER_LEFT" spacing="10.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                             <children>
+                                <Label text="Desde:" />
+                                <DatePicker fx:id="dpFechaInicio" promptText="Fecha Inicial" />
+                                <Label text="Hasta:" />
+                                <DatePicker fx:id="dpFechaFin" promptText="Fecha Final" />
+                             </children>
+                          </HBox>
+                          
+                          <Label text="Filtrar por Categoría:" GridPane.rowIndex="2" />
+                          <ComboBox fx:id="cmbCategoriaReporte" maxWidth="Infinity" promptText="Todas las categorías" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                       </children>
+                    </GridPane>
+                    
+                    <Separator />
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                       <children>
+                          <Button fx:id="btnVistaPreviaReporte" minHeight="36.0" mnemonicParsing="false" text="Vista Previa en Pantalla" />
+                          <Button fx:id="btnExportarPDF" minHeight="36.0" mnemonicParsing="false" text="Exportar a PDF (JasperReports)" />
+                          <Region HBox.hgrow="ALWAYS" />
+                          <Label fx:id="lblEstadoReporte" text="Reporte listo para ser generado." />
+                       </children>
+                    </HBox>
+                    
+                    <!-- Previsualización / Información del Reporte -->
+                    <TitledPane animated="false" collapsible="false" text="Información y Parámetros del Reporte" VBox.vgrow="ALWAYS">
+                       <content>
+                          <TextArea fx:id="txtDetallesReporte" editable="false" prefRowCount="8" promptText="Los detalles del reporte y parámetros JDBC aparecerán aquí..." wrapText="true" />
+                       </content>
+                    </TitledPane>
+                 </children>
+              </VBox>
+            </content>
+          </Tab>
+
+          <!-- ================= PESTAÑA 6: ASISTENTE IA ================= -->
+          <Tab fx:id="tabIA" text="Asistente IA">
+            <content>
+              <VBox spacing="12.0">
+                 <padding>
+                    <Insets bottom="14.0" left="14.0" right="14.0" top="14.0" />
+                 </padding>
+                 <children>
+                    <Label text="Módulo de Inteligencia Artificial Aplicada">
+                       <font>
+                          <Font name="System Bold" size="14.0" />
+                       </font>
+                    </Label>
+                    
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                       <children>
+                          <Label text="Funcionalidad Inteligente:" />
+                          <ComboBox fx:id="cmbFuncionIA" prefWidth="280.0" promptText="Seleccionar modelo o función..." />
+                          <Button fx:id="btnEjecutarIA" mnemonicParsing="false" text="Ejecutar Análisis Inteligente" />
+                       </children>
+                    </HBox>
+                    
+                    <TitledPane animated="false" collapsible="false" text="Resultados y Recomendaciones Generadas por IA" VBox.vgrow="ALWAYS">
+                       <content>
+                          <TextArea fx:id="txtResultadoIA" editable="false" prefRowCount="10" promptText="Aquí se mostrarán las sugerencias de reabastecimiento o predicción de demanda generadas por el modelo de IA..." wrapText="true" />
+                       </content>
+                    </TitledPane>
+                    
+                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                       <children>
+                          <Button fx:id="btnAplicarRecomendacionIA" mnemonicParsing="false" text="Aplicar Recomendación al Inventario" />
+                       </children>
+                    </HBox>
+                 </children>
+              </VBox>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
    </center>
 
-   <!-- ==================== LATERAL DERECHO (SERVICIOS, RESUMEN Y COBRO) ==================== -->
-   <right>
-      <VBox prefWidth="350.0" spacing="10.0" BorderPane.alignment="CENTER">
-         <children>
-            <!-- Panel 1: Servicios de Conveniencia -->
-            <TitledPane animated="false" text="Servicios Rápidos">
-               <content>
-                  <GridPane hgap="8.0" vgap="8.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Button fx:id="btnRecargas" maxWidth="Infinity" mnemonicParsing="false" text="Recargas (F5)" />
-                        <Button fx:id="btnPagoServicios" maxWidth="Infinity" mnemonicParsing="false" text="Pago Servicios (F6)" GridPane.columnIndex="1" />
-                        <Button fx:id="btnPines" maxWidth="Infinity" mnemonicParsing="false" text="Tarjetas de Regalo" GridPane.rowIndex="1" />
-                        <Button fx:id="btnDepositos" maxWidth="Infinity" mnemonicParsing="false" text="Depósitos / Retiros" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                     </children>
-                  </GridPane>
-               </content>
-            </TitledPane>
-
-            <!-- Panel 2: Datos de Cliente / Monedero -->
-            <TitledPane animated="false" text="Cliente / Puntos">
-               <content>
-                  <GridPane hgap="8.0" vgap="6.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="NEVER" minWidth="60.0" />
-                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="26.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Cliente:" />
-                        <TextField fx:id="txtCliente" promptText="Público General / No. Tarjeta" GridPane.columnIndex="1" />
-                        <Label text="Puntos:" GridPane.rowIndex="1" />
-                        <Label fx:id="lblPuntos" text="0 pts acumulados" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                     </children>
-                  </GridPane>
-               </content>
-            </TitledPane>
-
-            <!-- Panel 3: Resumen de Totales -->
-            <TitledPane animated="false" collapsible="false" text="Resumen de Cuenta">
-               <content>
-                  <GridPane hgap="10.0" vgap="6.0">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                      <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="80.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="6.0" prefHeight="10.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="32.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Artículos en canasta:" />
-                        <Label fx:id="lblNumArticulos" text="0" GridPane.columnIndex="1" />
-                        <Label text="Subtotal:" GridPane.rowIndex="1" />
-                        <Label fx:id="lblSubtotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label text="Descuentos:" GridPane.rowIndex="2" />
-                        <Label fx:id="lblDescuento" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label text="IVA (16%):" GridPane.rowIndex="3" />
-                        <Label fx:id="lblIva" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Separator GridPane.columnSpan="2" GridPane.rowIndex="4" />
-                        <Label text="TOTAL A PAGAR:" GridPane.rowIndex="5">
-                           <font>
-                              <Font name="System Bold" size="16.0" />
-                           </font>
-                        </Label>
-                        <Label fx:id="lblTotal" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="5">
-                           <font>
-                              <Font name="System Bold" size="20.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </GridPane>
-               </content>
-            </TitledPane>
-
-            <!-- Panel 4: Cobro y Pago -->
-            <TitledPane animated="false" collapsible="false" text="Liquidación / Cobro" VBox.vgrow="ALWAYS">
-               <content>
-                  <VBox spacing="8.0">
-                     <children>
-                        <Label text="Método de Pago:" />
-                        <ComboBox fx:id="cmbMetodoPago" maxWidth="Infinity" promptText="Efectivo" />
-                        <GridPane hgap="8.0" vgap="6.0">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" />
-                            <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="90.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="28.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label text="Paga con ($):" />
-                              <TextField fx:id="txtPagaCon" alignment="CENTER_RIGHT" promptText="0.00" GridPane.columnIndex="1" />
-                              <Label text="Cambio:" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="System Bold" size="13.0" />
-                                 </font>
-                              </Label>
-                              <Label fx:id="lblCambio" text="\$ 0.00" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="System Bold" size="16.0" />
-                                 </font>
-                              </Label>
-                           </children>
-                        </GridPane>
-                        <CheckBox fx:id="chkTicket" mnemonicParsing="false" selected="true" text="Imprimir comprobante / ticket" />
-                        <Button fx:id="btnCobrar" maxWidth="Infinity" minHeight="42.0" mnemonicParsing="false" text="COBRAR / FINALIZAR (F12)">
-                           <font>
-                              <Font name="System Bold" size="14.0" />
-                           </font>
-                        </Button>
-                     </children>
-                  </VBox>
-               </content>
-            </TitledPane>
-         </children>
-         <padding>
-            <Insets bottom="10.0" left="8.0" right="12.0" top="10.0" />
-         </padding>
-      </VBox>
-   </right>
-
-   <!-- ==================== PARTE INFERIOR (BARRA DE ESTADO Y TECLAS DE ATAJO) ==================== -->
+   <!-- ==================== PARTE INFERIOR (ESTADO Y ALERTAS) ==================== -->
    <bottom>
       <VBox BorderPane.alignment="CENTER">
          <children>
             <Separator />
-            <HBox alignment="CENTER_LEFT" spacing="10.0">
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
                <children>
                   <Label text="[F1] Ayuda" />
                   <Separator orientation="VERTICAL" />
-                  <Label text="[F2] Buscar Prod." />
-                  <Separator orientation="VERTICAL" />
-                  <Label text="[F4] Cantidad" />
-                  <Separator orientation="VERTICAL" />
-                  <Label text="[F5] Recargas" />
-                  <Separator orientation="VERTICAL" />
-                  <Label text="[F6] Pago Serv." />
-                  <Separator orientation="VERTICAL" />
-                  <Label text="[F7] Espera" />
+                  <Label text="[F2] Buscar" />
                   <Separator orientation="VERTICAL" />
                   <Label text="[F12] Cobrar" />
                   <Separator orientation="VERTICAL" />
                   <Label text="[Esc] Cancelar" />
                   <Region HBox.hgrow="ALWAYS" />
-                  <Label fx:id="lblMensajeEstado" text="Listo para escanear productos..." />
+                  <Label fx:id="lblAlertaStock" text="[!] Alerta: 2 productos con stock mínimo" />
+                  <Separator orientation="VERTICAL" />
+                  <Label fx:id="lblMensajeEstado" text="Pestaña activa: Caja / Ventas" />
                </children>
                <padding>
                   <Insets bottom="6.0" left="12.0" right="12.0" top="6.0" />
