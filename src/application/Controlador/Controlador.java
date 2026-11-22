@@ -142,7 +142,7 @@ public class Controlador {
         // Estado inicial
         actualizarAlertaStock();
         actualizarContadorCatalogo();
-        vista.getLblMensajeEstado().setText("Pestaña activa: Caja / Ventas");
+        vista.getLblMensajeEstado().setText("Pestaña activa: Ventas");
         Platform.runLater(() -> vista.getTxtCodigoBarras().requestFocus());
     }
 
@@ -362,7 +362,7 @@ public class Controlador {
      */
     private void actualizarContadorCatalogo() {
         int total = vista.getTblCatalogoProductos().getItems().size();
-        vista.getLblTotalProductosRegistrados().setText("Catálogo: " + total + " productos registrados");
+        vista.getLblTotalProductosRegistrados().setText(total + " productos");
     }
 
     private void limpiarCamposVenta() {
