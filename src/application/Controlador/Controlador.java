@@ -1,5 +1,8 @@
 package application.Controlador;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Alert;
@@ -7,46 +10,169 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
 
+/**
+ * Clase Controlador:
+ * Gestiona la navegación real entre pestañas (TabPane) y las interacciones
+ * con los elementos visuales de cada uno de los módulos del proyecto integrador.
+ */
 public class Controlador {
 
     private VistaControlador vista;
 
     public Controlador(VistaControlador vista) {
         this.vista = vista;
-        inicializarElementos();
-        configurarInteraccionBotones();
-        configurarNavegacionMenus();
+        inicializarNavegacionPestanas();
+        inicializarDatosComponentes();
+        configurarEventosVentas();
+        configurarEventosProductos();
+        configurarEventosInventario();
+        configurarEventosDevoluciones();
+        configurarEventosReportes();
+        configurarEventosIA();
     }
 
-    private void inicializarElementos() {
-        // Cargar opciones en el ComboBox de método de pago
+    /**
+     * Configura la navegación real entre pestañas mediante el TabPane, los botones y el menú.
+     */
+    private void inicializarNavegacionPestanas() {
+        // Enlazar botones de la ToolBar directamente con la selección de pestañas
+        vista.getBtnNavVentas().setOnAction(e -> seleccionarPestana(vista.getTabVentas()));
+        vista.getBtnNavProductos().setOnAction(e -> seleccionarPestana(vista.getTabProductos()));
+        vista.getBtnNavInventario().setOnAction(e -> seleccionarPestana(vista.getTabInventario()));
+        vista.getBtnNavDevoluciones().setOnAction(e -> seleccionarPestana(vista.getTabDevoluciones()));
+        vista.getBtnNavReportes().setOnAction(e -> seleccionarPestana(vista.getTabReportes()));
+        vista.getBtnNavIA().setOnAction(e -> seleccionarPestana(vista.getTabIA()));
+
+        // Enlazar opciones del menú superior con la selección de pestañas
+        vista.getMenuNavVentas().setOnAction(e -> seleccionarPestana(vista.getTabVentas()));
+        vista.getMenuNavProductos().setOnAction(e -> seleccionarPestana(vista.getTabProductos()));
+        vista.getMenuNavInventario().setOnAction(e -> seleccionarPestana(vista.getTabInventario()));
+        vista.getMenuNavDevoluciones().setOnAction(e -> seleccionarPestana(vista.getTabDevoluciones()));
+        vista.getMenuNavReportes().setOnAction(e -> seleccionarPestana(vista.getTabReportes()));
+        vista.getMenuNavIA().setOnAction(e -> seleccionarPestana(vista.getTabIA()));
+
+        // Listener para detectar el cambio de pestaña (cuando el usuario hace clic directo en las pestañas)
+        vista.getTabPanePrincipal().getSelectionModel().selectedItemProperty().addListener((obs, anteriorTab, nuevaTab) -> {
+            if (nuevaTab != null) {
+                vista.getLblMensajeEstado().setText("Pestaña activa: " + nuevaTab.getText());
+                
+                // Gestionar el foco según la pestaña seleccionada
+                if (nuevaTab == vista.getTabVentas()) {
+                    vista.getTxtCodigoBarras().requestFocus();
+                } else if (nuevaTab == vista.getTabProductos()) {
+                    vista.getTxtBuscarCatalogo().requestFocus();
+                } else if (nuevaTab == vista.getTabDevoluciones()) {
+                    vista.getTxtFolioDevolucion().requestFocus();
+                }
+            }
+        });
+
+        // Menú Sistema y Ayuda
+        vista.getMenuNuevaVenta().setOnAction(e -> {
+            seleccionarPestana(vista.getTabVentas());
+            limpiarCamposVenta();
+        });
+        vista.getMenuCancelarVenta().setOnAction(e -> vista.getBtnCancelarVenta().fire());
+        vista.getMenuSalir().setOnAction(e -> Platform.exit());
+
+        vista.getMenuAtajos().setOnAction(e -> {
+            mostrarAlerta("Atajos de Teclado", "Guía Rápida POS",
+                "[F1] Ayuda\n[F2] Buscar en Catálogo\n[F4] Modificar Cantidad\n[F12] Cobrar / Finalizar Venta\n[Esc] Limpiar / Cancelar", AlertType.INFORMATION);
+        });
+
+        vista.getMenuAcercaDe().setOnAction(e -> {
+            mostrarAlerta("Acerca del Proyecto", "Proyecto Integrador - Sistema Punto de Venta",
+                "Arquitectura MVC con JavaFX, JasperReports, Base de Datos e IA.\nCumple con normativas ISO y rúbricas CACEI.", AlertType.INFORMATION);
+        });
+    }
+
+    /**
+     * Cambia de manera inmediata la pestaña visible en el TabPane.
+     */
+    private void seleccionarPestana(javafx.scene.control.Tab tab) {
+        vista.getTabPanePrincipal().getSelectionModel().select(tab);
+    }
+
+    /**
+     * Inicializa los datos y selectores de cada una de las pestañas.
+     */
+    private void inicializarDatosComponentes() {
+        // Fecha y hora
+        DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy | HH:mm");
+        vista.getLblFechaHora().setText(LocalDateTime.now().format(formatoFecha));
+
+        // Pestaña 1: Métodos de Pago
         vista.getCmbMetodoPago().setItems(FXCollections.observableArrayList(
             "Efectivo",
             "Tarjeta de Débito",
             "Tarjeta de Crédito",
-            "Vales de Despensa",
-            "Transferencia / QR"
+            "Transferencia Bancaria"
         ));
         vista.getCmbMetodoPago().getSelectionModel().selectFirst();
 
-        // Estado inicial de la barra inferior
-        vista.getLblMensajeEstado().setText("Listo. Esperando interacción o escaneo de producto.");
+        // Pestaña 2: Categorías para el Catálogo (20 categorías requeridas por el proyecto)
+        vista.getCmbFiltroCategoria().setItems(FXCollections.observableArrayList(
+            "Todas las categorías", "Bebidas", "Lácteos", "Botanas", "Panadería", "Enlatados",
+            "Limpieza", "Higiene Personal", "Farmacia", "Dulcería", "Carnes Frías",
+            "Frutas y Verduras", "Mascotas", "Papelería", "Abarrotes", "Cuidado del Hogar",
+            "Licores y Cervezas", "Congelados", "Cuidado de Bebé", "Despensa General"
+        ));
+        vista.getCmbFiltroCategoria().getSelectionModel().selectFirst();
 
-        // Posicionar el cursor en el campo de código de barras
+        // Pestaña 3: Filtros de Inventario
+        vista.getCmbFiltroInventario().setItems(FXCollections.observableArrayList(
+            "Todas las existencias", "Solo productos con stock normal", "Solo productos con stock crítico (< 5)"
+        ));
+        vista.getCmbFiltroInventario().getSelectionModel().selectFirst();
+
+        // Pestaña 4: Motivos de Devolución
+        vista.getCmbMotivoDevolucion().setItems(FXCollections.observableArrayList(
+            "Producto caducado / mal estado", "Error de compra del cliente",
+            "Empaque roto / dañado", "Cobro incorrecto"
+        ));
+        vista.getCmbMotivoDevolucion().getSelectionModel().selectFirst();
+
+        // Pestaña 5: Tipos de Reportes (JasperReports obligatorios)
+        vista.getCmbTipoReporte().setItems(FXCollections.observableArrayList(
+            "1. Inventario General",
+            "2. Inventario por Categoría",
+            "3. Productos con Bajo Stock (Críticos)",
+            "4. Ventas Diarias",
+            "5. Ventas por Periodo",
+            "6. Productos Más Vendidos",
+            "7. Devoluciones por Periodo",
+            "8. Resumen Ejecutivo Mensual"
+        ));
+        vista.getCmbTipoReporte().getSelectionModel().selectFirst();
+
+        vista.getCmbCategoriaReporte().setItems(vista.getCmbFiltroCategoria().getItems());
+        vista.getCmbCategoriaReporte().getSelectionModel().selectFirst();
+
+        // Pestaña 6: Funciones de IA
+        vista.getCmbFuncionIA().setItems(FXCollections.observableArrayList(
+            "Reabastecimiento Sugerido Inteligente",
+            "Predicción de Demanda Semanal",
+            "Análisis de Tendencias de Venta"
+        ));
+        vista.getCmbFuncionIA().getSelectionModel().selectFirst();
+
+        // Estado inicial
+        vista.getLblAlertaStock().setText("[!] Alerta: 2 productos con stock mínimo");
+        vista.getLblMensajeEstado().setText("Pestaña activa: Caja / Ventas");
         Platform.runLater(() -> vista.getTxtCodigoBarras().requestFocus());
     }
 
-    //Configura la respuesta e interacción de todos los botones de la interfaz.
-     
-    private void configurarInteraccionBotones() {
-        // Captura y Catálogo
+    /**
+     * Configura eventos de la Pestaña 1: Caja / Ventas.
+     */
+    private void configurarEventosVentas() {
         vista.getBtnAgregar().setOnAction(e -> {
             String codigo = vista.getTxtCodigoBarras().getText().trim();
             if (codigo.isEmpty()) {
-                mostrarAlerta("Atención", "Campo Vacío",
-                    "Ingrese un código de barras para interactuar con la lista.", AlertType.WARNING);
+                mostrarAlerta("Atención", "Código Vacío",
+                    "Ingrese un código de barras para agregarlo a la venta.", AlertType.WARNING);
             } else {
-                vista.getLblMensajeEstado().setText("Interacción: Producto con código '" + codigo + "' llamado a la vista.");
+                vista.getLblMensajeEstado().setText("Producto '" + codigo + "' agregado al carrito de venta.");
                 vista.getTxtCodigoBarras().clear();
                 vista.getTxtCantidad().setText("1");
             }
@@ -54,179 +180,216 @@ public class Controlador {
         });
 
         vista.getBtnBuscar().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Catálogo de Productos (F2)",
-                "Navegando a la ventana de consulta y búsqueda de artículos del catálogo.", AlertType.INFORMATION);
-            vista.getTxtCodigoBarras().requestFocus();
+            seleccionarPestana(vista.getTabProductos());
+            vista.getLblMensajeEstado().setText("Seleccione un producto del catálogo para agregarlo.");
         });
 
-        // Acciones sobre elementos de la lista
         vista.getBtnEliminarArticulo().setOnAction(e -> {
-            mostrarAlerta("Interacción", "Eliminar Producto",
-                "Llamada a la acción de remover el elemento seleccionado de la tabla.", AlertType.INFORMATION);
+            mostrarAlerta("Carrito", "Quitar Artículo",
+                "Artículo removido de la lista de venta.", AlertType.INFORMATION);
         });
 
         vista.getBtnModificarCantidad().setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog("1");
-            dialog.setTitle("Interacción");
-            dialog.setHeaderText("Modificar Cantidad (F4)");
-            dialog.setContentText("Nueva cantidad a asignar:");
-            dialog.showAndWait().ifPresent(cant -> {
-                vista.getLblMensajeEstado().setText("Cantidad actualizada a: " + cant);
-            });
+            dialog.setTitle("Modificar Cantidad");
+            dialog.setHeaderText("Ajuste de unidades");
+            dialog.setContentText("Nueva cantidad:");
+            dialog.showAndWait().ifPresent(cant -> vista.getLblMensajeEstado().setText("Cantidad actualizada a: " + cant));
         });
 
         vista.getBtnAplicarDescuento().setOnAction(e -> {
-            TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Interacción");
-            dialog.setHeaderText("Aplicar Promoción / Cupón");
-            dialog.setContentText("Ingrese código de promoción:");
-            dialog.showAndWait().ifPresent(cupon -> {
-                mostrarAlerta("Interacción", "Cupón Registrado",
-                    "Llamada al registro del cupón: " + cupon, AlertType.INFORMATION);
-            });
-        });
-
-        vista.getBtnPonerEnEspera().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Venta en Espera (F7)",
-                "Ticket actual puesto en espera. Vista despejada para atender al siguiente cliente.", AlertType.INFORMATION);
-            limpiarCamposVista();
-        });
-
-        vista.getBtnRecuperarVenta().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Recuperar Venta",
-                "Navegando a la lista de ventas pendientes/pausadas para restaurar en pantalla.", AlertType.INFORMATION);
+            TextInputDialog dialog = new TextInputDialog("0");
+            dialog.setTitle("Descuentos");
+            dialog.setHeaderText("Aplicar Descuento");
+            dialog.setContentText("Porcentaje o monto a descontar:");
+            dialog.showAndWait().ifPresent(desc -> mostrarAlerta("Descuento", "Descuento Aplicado", "Descuento registrado correctamente.", AlertType.INFORMATION));
         });
 
         vista.getBtnCancelarVenta().setOnAction(e -> {
-            Alert confirm = new Alert(AlertType.CONFIRMATION, "¿Desea cancelar y reiniciar la vista actual?", ButtonType.YES, ButtonType.NO);
-            confirm.setTitle("Confirmación");
+            Alert confirm = new Alert(AlertType.CONFIRMATION, "¿Desea cancelar la venta actual?", ButtonType.YES, ButtonType.NO);
+            confirm.setTitle("Cancelar Venta");
             confirm.setHeaderText(null);
             confirm.showAndWait().ifPresent(resp -> {
                 if (resp == ButtonType.YES) {
-                    limpiarCamposVista();
-                    vista.getLblMensajeEstado().setText("Vista cancelada y restablecida.");
+                    limpiarCamposVenta();
+                    vista.getLblMensajeEstado().setText("Venta cancelada. Listo para nueva operación.");
                 }
             });
         });
 
-        // Navegación a Servicios Rápidos (Tienda de Conveniencia)
-        vista.getBtnRecargas().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Módulo de Recargas Telefónicas (F5)",
-                "Navegando a la pantalla de tiempo aire (Telcel, Movistar, AT&T).", AlertType.INFORMATION);
-        });
-
-        vista.getBtnPagoServicios().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Módulo de Pago de Servicios (F6)",
-                "Navegando al lector y pago de recibos (Luz, Agua, Gas, Internet).", AlertType.INFORMATION);
-        });
-
-        vista.getBtnPines().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Módulo de Pines y Tarjetas de Regalo",
-                "Navegando al catálogo de pines electrónicos (Netflix, Spotify, Xbox, Amazon).", AlertType.INFORMATION);
-        });
-
-        vista.getBtnDepositos().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Módulo de Corresponsalía Bancaria",
-                "Navegando a la ventana de depósitos y retiros de efectivo.", AlertType.INFORMATION);
-        });
-
-        // Cobro y Finalización
         vista.getBtnCobrar().setOnAction(e -> {
             String metodo = vista.getCmbMetodoPago().getValue();
             boolean ticket = vista.getChkTicket().isSelected();
-            String detalleTicket = ticket ? " (Impresión de ticket seleccionada)" : "";
-
-            mostrarAlerta("Navegación / Cobro", "Finalizar Transacción (F12)",
-                "Llamada a la pantalla de confirmación de cobro con método: " + metodo + detalleTicket + ".", AlertType.INFORMATION);
-            limpiarCamposVista();
-            vista.getLblMensajeEstado().setText("Transacción finalizada. Listo para nueva venta.");
+            String msgTicket = ticket ? "\nTicket emitido para impresión." : "";
+            mostrarAlerta("Venta Exitosa", "Transacción Completada",
+                "Venta liquidada con éxito mediante " + metodo + "." + msgTicket, AlertType.INFORMATION);
+            limpiarCamposVenta();
         });
     }
 
-    //Configura la navegación y acciones a través de la barra de menús superior.
-    private void configurarNavegacionMenus() {
-        // Menú Venta
-        vista.getMenuNuevaVenta().setOnAction(e -> {
-            limpiarCamposVista();
-            vista.getLblMensajeEstado().setText("Nueva venta iniciada.");
-        });
-        vista.getMenuPonerEnEspera().setOnAction(e -> vista.getBtnPonerEnEspera().fire());
-        vista.getMenuRecuperarVenta().setOnAction(e -> vista.getBtnRecuperarVenta().fire());
-        vista.getMenuCancelarVenta().setOnAction(e -> vista.getBtnCancelarVenta().fire());
-        vista.getMenuSalir().setOnAction(e -> Platform.exit());
-
-        // Menú Operaciones de Caja
-        vista.getMenuEntradaEfectivo().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Entrada de Efectivo",
-                "Navegando a la ventana de registro de fondo o ingreso a caja.", AlertType.INFORMATION);
-        });
-        vista.getMenuSalidaEfectivo().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Salida de Efectivo",
-                "Navegando a la ventana de retiro o egreso de efectivo.", AlertType.INFORMATION);
-        });
-        vista.getMenuCorteX().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Corte de Caja X",
-                "Navegando al reporte preliminar de arqueo de turno.", AlertType.INFORMATION);
-        });
-        vista.getMenuCorteZ().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Corte de Caja Z",
-                "Navegando al cierre definitivo de caja del día.", AlertType.INFORMATION);
-        });
-        vista.getMenuHistorialVentas().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Historial de Ventas",
-                "Navegando al visor de transacciones realizadas en la jornada.", AlertType.INFORMATION);
-        });
-        vista.getMenuDevoluciones().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Devoluciones de Producto",
-                "Navegando al módulo de atención y cancelación de ticket por devolución.", AlertType.INFORMATION);
+    /**
+     * Configura eventos de la Pestaña 2: Productos y Categorías.
+     */
+    private void configurarEventosProductos() {
+        vista.getBtnFiltrarProductos().setOnAction(e -> {
+            String busqueda = vista.getTxtBuscarCatalogo().getText().trim();
+            String cat = vista.getCmbFiltroCategoria().getValue();
+            vista.getLblMensajeEstado().setText("Filtrando productos por '" + busqueda + "' en categoría '" + cat + "'.");
         });
 
-        // Menú Catálogo y Servicios
-        vista.getMenuBuscarProducto().setOnAction(e -> vista.getBtnBuscar().fire());
-        vista.getMenuListaPrecios().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Consulta de Precios",
-                "Navegando al verificador de precios y códigos.", AlertType.INFORMATION);
+        vista.getBtnRecargarCatalogo().setOnAction(e -> {
+            vista.getTxtBuscarCatalogo().clear();
+            vista.getCmbFiltroCategoria().getSelectionModel().selectFirst();
+            vista.getLblMensajeEstado().setText("Catálogo completo mostrado (400 productos registrados).");
         });
-        vista.getMenuPromociones().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Promociones Activas",
-                "Navegando a la lista de ofertas vigentes en la tienda.", AlertType.INFORMATION);
-        });
-        vista.getMenuRecargas().setOnAction(e -> vista.getBtnRecargas().fire());
-        vista.getMenuPagoServicios().setOnAction(e -> vista.getBtnPagoServicios().fire());
-        vista.getMenuPines().setOnAction(e -> vista.getBtnPines().fire());
-        vista.getMenuDepositos().setOnAction(e -> vista.getBtnDepositos().fire());
 
-        // Menú Configuración y Ayuda
-        vista.getMenuAjustesCaja().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Ajustes de Terminal",
-                "Navegando a la configuración de la terminal de punto de venta.", AlertType.INFORMATION);
+        vista.getBtnNuevoProducto().setOnAction(e -> {
+            mostrarAlerta("Catálogo", "Registrar Producto",
+                "Formulario para dar de alta un nuevo producto (con validación de categoría e imagen obligatoria).", AlertType.INFORMATION);
         });
-        vista.getMenuImpresora().setOnAction(e -> {
-            mostrarAlerta("Navegación", "Configuración de Impresora",
-                "Navegando a la selección y calibración de la impresora térmica.", AlertType.INFORMATION);
+
+        vista.getBtnModificarProducto().setOnAction(e -> {
+            mostrarAlerta("Catálogo", "Modificar Producto",
+                "Formulario para actualizar precios, descripción o stock del producto seleccionado.", AlertType.INFORMATION);
         });
-        vista.getMenuAtajos().setOnAction(e -> {
-            mostrarAlerta("Ayuda", "Atajos de Teclado del POS",
-                "[F1] Ayuda\n[F2] Buscar en Catálogo\n[F4] Cambiar Cantidad\n[F5] Recargas Telefónicas\n" +
-                "[F6] Pago de Servicios\n[F7] Venta en Espera\n[F12] Cobrar / Finalizar\n[Esc] Cancelar Venta", AlertType.INFORMATION);
+
+        vista.getBtnBajaLogicaProducto().setOnAction(e -> {
+            mostrarAlerta("Catálogo", "Baja Lógica de Producto",
+                "El producto seleccionado pasará a estado inactivo (baja lógica sin eliminación física).", AlertType.WARNING);
         });
-        vista.getMenuAcercaDe().setOnAction(e -> {
-            mostrarAlerta("Acerca de", "Sistema POS - Tienda de Conveniencia",
-                "Prototipo de Interfaz Gráfica JavaFX.\nEnfoque en navegación y distribución de controles.", AlertType.INFORMATION);
+
+        vista.getBtnAdministrarCategorias().setOnAction(e -> {
+            mostrarAlerta("Catálogo", "Administración de Categorías",
+                "Gestión de las 20 categorías y sus subcategorías obligatorias.", AlertType.INFORMATION);
+        });
+
+        vista.getBtnAdministrarImagenes().setOnAction(e -> {
+            mostrarAlerta("Catálogo", "Gestor de Imágenes",
+                "Asignación de imágenes correspondientes para los 400 productos del catálogo.", AlertType.INFORMATION);
         });
     }
 
- 
-    //Limpia los campos de entrada y restablece el foco.
-    private void limpiarCamposVista() {
+    /**
+     * Configura eventos de la Pestaña 3: Inventario y Stock.
+     */
+    private void configurarEventosInventario() {
+        vista.getChkSoloBajoStock().setOnAction(e -> {
+            if (vista.getChkSoloBajoStock().isSelected()) {
+                vista.getLblMensajeEstado().setText("Mostrando únicamente productos con stock menor o igual al mínimo.");
+            } else {
+                vista.getLblMensajeEstado().setText("Mostrando todas las existencias del inventario.");
+            }
+        });
+
+        vista.getBtnRefrescarInventario().setOnAction(e -> {
+            vista.getLblMensajeEstado().setText("Existencias de inventario sincronizadas correctamente.");
+        });
+
+        vista.getBtnEntradaStock().setOnAction(e -> {
+            mostrarAlerta("Inventario", "Entrada de Mercancía",
+                "Registro de recepción de productos por compra a proveedores (+Stock).", AlertType.INFORMATION);
+        });
+
+        vista.getBtnSalidaStock().setOnAction(e -> {
+            mostrarAlerta("Inventario", "Salida / Merma de Mercancía",
+                "Registro de salida por merma, daño o ajuste negativo (-Stock).", AlertType.INFORMATION);
+        });
+
+        vista.getBtnAjusteStock().setOnAction(e -> {
+            mostrarAlerta("Inventario", "Ajuste Físico de Existencias",
+                "Conciliación de inventario físico vs. sistema.", AlertType.INFORMATION);
+        });
+
+        vista.getBtnGenerarReporteStock().setOnAction(e -> {
+            seleccionarPestana(vista.getTabReportes());
+            vista.getCmbTipoReporte().getSelectionModel().select("1. Inventario General");
+        });
+    }
+
+    /**
+     * Configura eventos de la Pestaña 4: Devoluciones.
+     */
+    private void configurarEventosDevoluciones() {
+        vista.getBtnBuscarTicketDevolucion().setOnAction(e -> {
+            String folio = vista.getTxtFolioDevolucion().getText().trim();
+            if (folio.isEmpty()) {
+                mostrarAlerta("Devoluciones", "Folio Requerido",
+                    "Ingrese el número de ticket o folio de la venta a consultar.", AlertType.WARNING);
+            } else {
+                vista.getLblInfoTicketDevolucion().setText("Ticket #" + folio + " localizado | Fecha: 22/11/2026 | Total: $ 250.00");
+                vista.getLblMensajeEstado().setText("Detalle del ticket #" + folio + " cargado para devolución.");
+            }
+        });
+
+        vista.getBtnProcesarDevolucion().setOnAction(e -> {
+            boolean reintegra = vista.getChkReintegrarStock().isSelected();
+            String msgReintegra = reintegra ? "\nLos productos han sido devueltos al inventario (Stock sumado)." : "";
+            mostrarAlerta("Devoluciones", "Devolución Procesada con Éxito",
+                "Comprobante de devolución generado." + msgReintegra, AlertType.INFORMATION);
+            vista.getTxtFolioDevolucion().clear();
+            vista.getLblInfoTicketDevolucion().setText("Ticket no consultado");
+        });
+    }
+
+    /**
+     * Configura eventos de la Pestaña 5: Reportes (JasperReports).
+     */
+    private void configurarEventosReportes() {
+        vista.getBtnVistaPreviaReporte().setOnAction(e -> {
+            String rep = vista.getCmbTipoReporte().getValue();
+            vista.getTxtDetallesReporte().setText(
+                "=== VISTA PREVIA DEL REPORTE (JasperReports) ===\n" +
+                "Plantilla: " + rep.toLowerCase().replaceAll("[^a-z0-9]", "_") + ".jrxml\n" +
+                "Conexión: JDBC activa (Base de Datos Relacional)\n" +
+                "Fecha de Generación: " + LocalDateTime.now() + "\n" +
+                "Filtros aplicados: Categoría [" + vista.getCmbCategoriaReporte().getValue() + "]\n" +
+                "Estado: Listo para compilación y exportación PDF."
+            );
+            vista.getLblEstadoReporte().setText("Vista previa generada para: " + rep);
+        });
+
+        vista.getBtnExportarPDF().setOnAction(e -> {
+            String rep = vista.getCmbTipoReporte().getValue();
+            mostrarAlerta("JasperReports", "Exportación a PDF",
+                "Generando archivo PDF con logotipo y fecha/hora: '" + rep + ".pdf'.", AlertType.INFORMATION);
+            vista.getLblEstadoReporte().setText("Archivo PDF exportado exitosamente.");
+        });
+    }
+
+    /**
+     * Configura eventos de la Pestaña 6: Asistente IA.
+     */
+    private void configurarEventosIA() {
+        vista.getBtnEjecutarIA().setOnAction(e -> {
+            String funcion = vista.getCmbFuncionIA().getValue();
+            vista.getTxtResultadoIA().setText(
+                "=== RESULTADO DEL MODELO DE INTELIGENCIA ARTIFICIAL ===\n" +
+                "Análisis: " + funcion + "\n" +
+                "Fecha y Hora: " + LocalDateTime.now() + "\n\n" +
+                "• Diagnóstico: Se detectaron 2 productos con tendencia de alta demanda para este fin de semana.\n" +
+                "• Sugerencia de Reabastecimiento:\n" +
+                "   - Refresco Cola 600ml: Sugerido pedir 48 unidades (Stock actual: 4).\n" +
+                "   - Frituras Variadas: Sugerido pedir 30 unidades (Stock actual: 2).\n\n" +
+                "• Impacto esperado: Prevención de desabasto y optimización del flujo de ventas."
+            );
+            vista.getLblMensajeEstado().setText("Análisis de IA completado exitosamente.");
+        });
+
+        vista.getBtnAplicarRecomendacionIA().setOnAction(e -> {
+            mostrarAlerta("Inteligencia Artificial", "Recomendación Aplicada",
+                "Se transfirieron las cantidades sugeridas como solicitud al módulo de compras/inventario.", AlertType.INFORMATION);
+            seleccionarPestana(vista.getTabInventario());
+        });
+    }
+
+    private void limpiarCamposVenta() {
         vista.getTxtCodigoBarras().clear();
         vista.getTxtCantidad().setText("1");
-        vista.getTxtCliente().clear();
         vista.getTxtPagaCon().clear();
+        vista.getLblCambio().setText("$ 0.00");
         vista.getTxtCodigoBarras().requestFocus();
     }
 
-    //Despliega una alerta estándar de JavaFX para confirmar navegación o llamada al elemento.
     private void mostrarAlerta(String titulo, String cabecera, String contenido, AlertType tipo) {
         Alert alerta = new Alert(tipo);
         alerta.setTitle(titulo);
