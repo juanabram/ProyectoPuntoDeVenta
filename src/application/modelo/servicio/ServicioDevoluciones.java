@@ -2,14 +2,11 @@ package application.modelo.servicio;
 
 import java.util.ArrayList;
 import java.util.List;
-import application.modelo.datos.IDevolucionDAO;
-import application.modelo.datos.IVentaDAO;
-import application.modelo.datos.DevolucionDAOImpl;
-import application.modelo.datos.VentaDAOImpl;
 import application.modelo.Devolucion;
 import application.modelo.ItemDevolucion;
 import application.modelo.ItemVenta;
 import application.modelo.Venta;
+import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -18,8 +15,7 @@ import javafx.collections.ObservableList;
  */
 public class ServicioDevoluciones {
 
-    private final IDevolucionDAO devolucionDAO = new DevolucionDAOImpl();
-    private final IVentaDAO ventaDAO = new VentaDAOImpl();
+    private final RepositorioDatos repo = RepositorioDatos.getInstancia();
     private final ObservableList<ItemDevolucion> itemsDevolucion = FXCollections.observableArrayList();
 
     public ObservableList<ItemDevolucion> getItemsDevolucion() {
@@ -29,7 +25,7 @@ public class ServicioDevoluciones {
     public Venta buscarVenta(String folio) {
         itemsDevolucion.clear();
         if (folio == null || folio.trim().isEmpty()) return null;
-        Venta v = ventaDAO.buscarPorFolio(folio.trim());
+        Venta v = repo.buscarVentaPorFolio(folio.trim());
         if (v != null) {
             for (ItemVenta item : v.getItems()) {
                 itemsDevolucion.add(new ItemDevolucion(
@@ -72,7 +68,7 @@ public class ServicioDevoluciones {
         }
 
         double total = calcularTotalReembolso();
-        String folioDev = "DEV-" + (devolucionDAO.listarDevoluciones().size() + 101);
+        String folioDev = "DEV-" + (repo.listarDevoluciones().size() + 101);
 
         Devolucion dev = new Devolucion(
             folioDev, folioVenta,
@@ -80,7 +76,7 @@ public class ServicioDevoluciones {
             reintegrarStock, total, itemsEfectivos
         );
 
-        devolucionDAO.registrarDevolucion(dev);
+        repo.registrarDevolucion(dev);
         itemsDevolucion.clear();
         return dev;
     }

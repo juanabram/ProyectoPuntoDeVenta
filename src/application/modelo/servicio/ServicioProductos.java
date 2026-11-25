@@ -1,9 +1,8 @@
 package application.modelo.servicio;
 
 import java.util.List;
-import application.modelo.datos.IProductoDAO;
-import application.modelo.datos.ProductoDAOImpl;
 import application.modelo.Producto;
+import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -12,7 +11,7 @@ import javafx.collections.ObservableList;
  */
 public class ServicioProductos {
 
-    private final IProductoDAO productoDAO = new ProductoDAOImpl();
+    private final RepositorioDatos repo = RepositorioDatos.getInstancia();
     private final ObservableList<Producto> listaProductos = FXCollections.observableArrayList();
 
     public ServicioProductos() {
@@ -24,11 +23,11 @@ public class ServicioProductos {
     }
 
     public void recargarProductos() {
-        listaProductos.setAll(productoDAO.listarTodos());
+        listaProductos.setAll(repo.listarTodosProductos());
     }
 
     public void filtrar(String busqueda, String categoria) {
-        List<Producto> res = productoDAO.buscarPorCriterio(busqueda, categoria);
+        List<Producto> res = repo.buscarProductosPorCriterio(busqueda, categoria);
         listaProductos.setAll(res);
     }
 
@@ -47,7 +46,7 @@ public class ServicioProductos {
             throw new IllegalArgumentException("Las cantidades de stock no pueden ser negativas.");
         }
 
-        if (productoDAO.buscarPorCodigo(codigo.trim()) != null) {
+        if (repo.buscarProductoPorCodigo(codigo.trim()) != null) {
             throw new IllegalArgumentException("Ya existe un producto registrado con el código '" + codigo + "'.");
         }
 
@@ -59,7 +58,7 @@ public class ServicioProductos {
             precio, stock, stockMinimo, "Activo"
         );
 
-        productoDAO.insertar(nuevo);
+        repo.insertarProducto(nuevo);
         recargarProductos();
     }
 
@@ -83,13 +82,13 @@ public class ServicioProductos {
         p.setStock(nuevoStock);
         p.setStockMinimo(nuevoStockMinimo);
 
-        productoDAO.actualizar(p);
+        repo.actualizarProducto(p);
         recargarProductos();
     }
 
     public void darBajaLogica(Producto p) {
         if (p != null) {
-            productoDAO.bajaLogica(p.getCodigo());
+            repo.bajaLogicaProducto(p.getCodigo());
             recargarProductos();
         }
     }

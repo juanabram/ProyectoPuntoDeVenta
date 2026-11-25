@@ -1,16 +1,12 @@
 package application.modelo.servicio;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import application.modelo.datos.IProductoDAO;
-import application.modelo.datos.IVentaDAO;
-import application.modelo.datos.ProductoDAOImpl;
-import application.modelo.datos.VentaDAOImpl;
 import application.modelo.ItemVenta;
 import application.modelo.Producto;
 import application.modelo.Venta;
+import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -19,8 +15,7 @@ import javafx.collections.ObservableList;
  */
 public class ServicioVentas {
 
-    private final IProductoDAO productoDAO = new ProductoDAOImpl();
-    private final IVentaDAO ventaDAO = new VentaDAOImpl();
+    private final RepositorioDatos repo = RepositorioDatos.getInstancia();
 
     private final ObservableList<ItemVenta> carrito = FXCollections.observableArrayList();
     private static final double TASA_IVA = 0.16;
@@ -37,7 +32,7 @@ public class ServicioVentas {
             throw new IllegalArgumentException("La cantidad debe ser mayor a cero.");
         }
 
-        Producto p = productoDAO.buscarPorCodigo(codigo.trim());
+        Producto p = repo.buscarProductoPorCodigo(codigo.trim());
         if (p == null) {
             throw new IllegalArgumentException("El producto con código '" + codigo + "' no existe en el catálogo.");
         }
@@ -87,7 +82,7 @@ public class ServicioVentas {
         if (nuevaCantidad <= 0) {
             throw new IllegalArgumentException("La cantidad debe ser de al menos 1 unidad.");
         }
-        Producto p = productoDAO.buscarPorCodigo(item.getCodigo());
+        Producto p = repo.buscarProductoPorCodigo(item.getCodigo());
         if (p != null && nuevaCantidad > p.getStock()) {
             throw new IllegalArgumentException("Stock insuficiente para '" + p.getNombre() + "'. Existencias disponibles: " + p.getStock());
         }
@@ -164,7 +159,7 @@ public class ServicioVentas {
         }
 
         double cambio = "Efectivo".equalsIgnoreCase(metodoPago) ? (pagaCon - total) : 0.0;
-        String folio = ventaDAO.generarSiguienteFolio();
+        String folio = repo.siguienteFolioVenta();
 
         List<ItemVenta> copiaItems = new ArrayList<>(carrito);
         Venta venta = new Venta(
@@ -174,7 +169,7 @@ public class ServicioVentas {
             pagaCon, cambio
         );
 
-        ventaDAO.registrarVenta(venta);
+        repo.registrarVenta(venta);
         vaciarCarrito();
         return venta;
     }

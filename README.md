@@ -1,6 +1,6 @@
 # Punto de Venta - Tienda de Conveniencia
 
-Sistema de Punto de Venta desarrollado en **JavaFX 21** con arquitectura por capas (**MVC + DAO + Service Layer**).
+Sistema de Punto de Venta desarrollado en **JavaFX 21** con arquitectura por capas (**MVC + Repositorio Resiliente + Service Layer**).
 
 ---
 
@@ -17,7 +17,7 @@ src/
       ├── Controlador/
       │    ├── VistaControlador.java          # Inyección FXML de componentes visuales de todas las pestañas
       │    └── Controlador.java               # Coordinador de eventos, atajos de teclado y servicios
-      ├── modelo/                             # Lógica del Modelo (Entidades, DAO y Servicios)
+      ├── modelo/                             # Lógica del Modelo (14 clases: Entidades, Datos y Servicios)
       │    ├── Categoria.java                 # Modelo de categorías de productos
       │    ├── Producto.java                  # Modelo de producto con control de stock y precios
       │    ├── ItemVenta.java                 # Línea del carrito de compras
@@ -25,14 +25,9 @@ src/
       │    ├── MovimientoInventario.java      # Registro de kardex (entradas, salidas, ajustes)
       │    ├── Devolucion.java                # Encabezado de devolución/reembolso
       │    ├── ItemDevolucion.java            # Detalle de artículos devueltos
-      │    ├── datos/                         # Capa de Acceso a Datos (DAO)
+      │    ├── datos/                         # Capa de Datos y Conexión JDBC
       │    │    ├── ConexionBD.java           # Administrador de conexiones JDBC (MySQL, SQL Server, etc.)
-      │    │    ├── RepositorioDatos.java     # Repositorio en memoria precargado con 20 productos de prueba
-      │    │    ├── ICategoriaDAO.java / CategoriaDAOImpl.java
-      │    │    ├── IProductoDAO.java / ProductoDAOImpl.java
-      │    │    ├── IVentaDAO.java / VentaDAOImpl.java
-      │    │    ├── IInventarioDAO.java / InventarioDAOImpl.java
-      │    │    └── IDevolucionDAO.java / DevolucionDAOImpl.java
+      │    │    └── RepositorioDatos.java     # CRUD JDBC con respaldo automático en memoria (20 productos)
       │    └── servicio/                      # Capa de Lógica de Negocio
       │         ├── ServicioVentas.java       # Búsqueda por código de barras, totales, IVA, pago y cambio
       │         ├── ServicioProductos.java    # Catálogo, filtros, altas, modificaciones y baja lógica
@@ -48,7 +43,7 @@ src/
 
 ## 🗄️ Guía para Conectar la Base de Datos
 
-Todo el backend fue diseñado con el patrón **DAO resiliente**. Si la base de datos aún no está conectada, el sistema opera de manera autónoma con el repositorio en memoria ([`RepositorioDatos.java`](src/application/modelo/datos/RepositorioDatos.java)). Cuando esté lista la base de datos:
+Todo el backend opera con un **repositorio resiliente** en [`RepositorioDatos.java`](src/application/modelo/datos/RepositorioDatos.java): si la base de datos aún no está conectada, trabaja de manera autónoma en memoria con 20 productos iniciales. Cuando esté lista la base de datos:
 
 1. **Crear las tablas en MySQL / MariaDB / SQL Server:**
    - Ejecutar el script incluido en la raíz del proyecto: [`schema.sql`](schema.sql).
@@ -59,7 +54,7 @@ Todo el backend fue diseñado con el patrón **DAO resiliente**. Si la base de d
 3. **Driver JDBC:**
    - Colocar el conector JAR correspondiente (por ejemplo `mysql-connector-j-8.x.jar`) en la carpeta `lib/` y añadirlo al Build Path.
 4. **Sentencias SQL ya implementadas:**
-   - Los métodos en las clases `*DAOImpl.java` ya incluyen consultas `PreparedStatement` para `INSERT`, `UPDATE`, `SELECT` y manejo de transacciones.
+   - Todos los métodos CRUD y transaccionales en [`RepositorioDatos.java`](src/application/modelo/datos/RepositorioDatos.java) ya incluyen `PreparedStatement` para `INSERT`, `UPDATE`, `SELECT` (alineados con `id_categoria` en `schema.sql`) y transacciones.
 
 ---
 

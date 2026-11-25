@@ -4,16 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import application.modelo.datos.IInventarioDAO;
-import application.modelo.datos.IProductoDAO;
-import application.modelo.datos.IVentaDAO;
-import application.modelo.datos.InventarioDAOImpl;
-import application.modelo.datos.ProductoDAOImpl;
-import application.modelo.datos.VentaDAOImpl;
-import application.modelo.ItemVenta;
-import application.modelo.MovimientoInventario;
 import application.modelo.Producto;
 import application.modelo.Venta;
+import application.modelo.datos.RepositorioDatos;
 
 /**
  * Servicio de Lógica de Negocio: Generación de Reportes del Sistema
@@ -21,9 +14,7 @@ import application.modelo.Venta;
  */
 public class ServicioReportes {
 
-    private final IProductoDAO productoDAO = new ProductoDAOImpl();
-    private final IVentaDAO ventaDAO = new VentaDAOImpl();
-    private final IInventarioDAO inventarioDAO = new InventarioDAOImpl();
+    private final RepositorioDatos repo = RepositorioDatos.getInstancia();
 
     private static final DateTimeFormatter FMT_FECHA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
@@ -37,11 +28,11 @@ public class ServicioReportes {
         sb.append("Fecha de Emisión : ").append(LocalDateTime.now().format(FMT_FECHA)).append("\n");
         sb.append("Filtro Periodo   : ").append(fechaInicio != null ? fechaInicio : "Histórico").append(" al ").append(fechaFin != null ? fechaFin : "Actual").append("\n");
         sb.append("Filtro Categoría : ").append(categoria != null ? categoria : "Todas").append("\n");
-        sb.append("Conexión Datos   : Capa DAO Activa (Preparada para Base de Datos Relacional)\n");
+        sb.append("Conexión Datos   : RepositorioDatos / ConexionBD (Listo para BD Relacional)\n");
         sb.append("-------------------------------------------------------------------------\n\n");
 
         if (tipoReporte.contains("1. Inventario General")) {
-            List<Producto> lista = productoDAO.listarTodos();
+            List<Producto> lista = repo.listarTodosProductos();
             sb.append(String.format("%-15s %-30s %-15s %8s %8s %10s\n", "CÓDIGO", "NOMBRE", "CATEGORÍA", "PRECIO", "STOCK", "ESTADO"));
             sb.append("-----------------------------------------------------------------------------------------\n");
             for (Producto p : lista) {
@@ -53,7 +44,7 @@ public class ServicioReportes {
             sb.append("Total de Productos en Catálogo: ").append(lista.size()).append("\n");
 
         } else if (tipoReporte.contains("3. Productos con Bajo Stock")) {
-            List<Producto> criticos = productoDAO.listarCriticos();
+            List<Producto> criticos = repo.listarProductosCriticos();
             sb.append(String.format("%-15s %-32s %10s %10s %12s\n", "CÓDIGO", "PRODUCTO", "EXISTENCIAS", "MÍNIMO", "DÉFICIT"));
             sb.append("-----------------------------------------------------------------------------------------\n");
             for (Producto p : criticos) {
@@ -66,7 +57,7 @@ public class ServicioReportes {
             sb.append("Total de Productos en Alerta Crítica: ").append(criticos.size()).append("\n");
 
         } else if (tipoReporte.contains("4. Ventas Diarias") || tipoReporte.contains("5. Ventas por Periodo")) {
-            List<Venta> ventas = ventaDAO.listarVentasPorFecha(fechaInicio, fechaFin);
+            List<Venta> ventas = repo.listarVentasPorRango(fechaInicio, fechaFin);
             sb.append(String.format("%-12s %-18s %-15s %10s %10s %12s\n", "FOLIO", "FECHA/HORA", "CAJERO", "SUBTOTAL", "IVA", "TOTAL"));
             sb.append("-----------------------------------------------------------------------------------------\n");
             double totalRecaudado = 0.0;
