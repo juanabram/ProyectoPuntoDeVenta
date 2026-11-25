@@ -10,9 +10,7 @@ import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Servicio de Lógica de Negocio: Gestión de Devoluciones y Reembolsos
- */
+// Logica de devoluciones y reembolsos
 public class ServicioDevoluciones {
 
     private final RepositorioDatos repo = RepositorioDatos.getInstancia();

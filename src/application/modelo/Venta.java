@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Modelo de Entidad: Venta
- * Representa una transacción de venta finalizada o registrada en el sistema.
- */
+// Venta registrada con sus totales y articulos
 public class Venta {
 
     private String folio;

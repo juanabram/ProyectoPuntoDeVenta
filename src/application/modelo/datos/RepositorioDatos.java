@@ -24,9 +24,7 @@ import application.modelo.MovimientoInventario;
 import application.modelo.Producto;
 import application.modelo.Venta;
 
-/**
- * Repositorio de Datos Central (CRUD unificado en memoria + respaldo JDBC).
- */
+// Acceso centralizado a datos (JDBC con respaldo en memoria)
 public class RepositorioDatos {
 
     private static final String SQL_PROD_BASE =
@@ -101,9 +99,7 @@ public class RepositorioDatos {
         for (Producto p : semilla) productosMap.put(p.getCodigo(), p);
     }
 
-    // =========================================================================
-    // PRODUCTOS
-    // =========================================================================
+    // Productos
 
     public synchronized List<Producto> listarTodosProductos() {
         return consultarConRespaldo(SQL_PROD_BASE, this::mapearProducto, () -> new ArrayList<>(productosMap.values()));
@@ -182,9 +178,7 @@ public class RepositorioDatos {
         return res != null ? res : (p != null);
     }
 
-    // =========================================================================
-    // VENTAS
-    // =========================================================================
+    // Ventas
 
     public synchronized String siguienteFolioVenta() {
         return "TKT-" + (contadorFolioVenta++);
@@ -239,9 +233,7 @@ public class RepositorioDatos {
             .collect(Collectors.toList());
     }
 
-    // =========================================================================
-    // INVENTARIO
-    // =========================================================================
+    // Inventario
 
     public synchronized boolean registrarMovimiento(MovimientoInventario mov) {
         if (mov == null) return false;
@@ -272,9 +264,7 @@ public class RepositorioDatos {
         return new ArrayList<>(movimientosList);
     }
 
-    // =========================================================================
-    // DEVOLUCIONES Y CATEGORÍAS
-    // =========================================================================
+    // Devoluciones y categorias
 
     public synchronized String siguienteFolioDevolucion() {
         return "DEV-" + (contadorFolioDevolucion++);
@@ -331,9 +321,7 @@ public class RepositorioDatos {
         return (bd != null && !bd.isEmpty()) ? bd : new ArrayList<>(categoriasList);
     }
 
-    // =========================================================================
-    // HELPERS GENÉRICOS JDBC Y MAPEADORES
-    // =========================================================================
+    // Helpers JDBC y mapeadores
 
     private <T> List<T> consultarConRespaldo(String sql, RowMapper<T> mapper, Supplier<List<T>> respaldo, Object... params) {
         List<T> bd = consultarLista(sql, mapper, params);

@@ -3,10 +3,7 @@ package application.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Modelo de Entidad: Categoria
- * Representa una categoría y sus subcategorías del catálogo del POS.
- */
+// Categoria de productos del catalogo
 public class Categoria {
 
     private int id;

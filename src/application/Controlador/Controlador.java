@@ -35,11 +35,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
 
-/**
- * Clase Controlador:
- * Conecta la Vista (VistaControlador / FXML) con la arquitectura de backend
- * (Servicios, Modelos y capa DAO/Datos).
- */
+// Conecta los controles FXML con los servicios del modelo
 public class Controlador {
 
     private final VistaControlador vista;
@@ -69,9 +65,7 @@ public class Controlador {
         configurarEventosReportes();
     }
 
-    /**
-     * Configura los enlaces de datos (PropertyValueFactory) y celdas de las 4 tablas principales.
-     */
+    // Enlaza columnas y celdas de las 4 tablas
     @SuppressWarnings("unchecked")
     private void inicializarTablas() {
         // 1. Tabla de Ventas (Carrito de Compras)
@@ -141,9 +135,7 @@ public class Controlador {
         });
     }
 
-    /**
-     * Configura la navegación y respuesta al alternar entre pestañas del TabPane.
-     */
+    // Navegacion entre pestanas y menu superior
     private void inicializarNavegacionPestanas() {
         vista.getTabPanePrincipal().getSelectionModel().selectedItemProperty().addListener((obs, anteriorTab, nuevaTab) -> {
             if (nuevaTab != null) {
@@ -187,9 +179,7 @@ public class Controlador {
         vista.getTabPanePrincipal().getSelectionModel().select(tab);
     }
 
-    /**
-     * Inicializa los datos y selectores de cada una de las pestañas.
-     */
+    // Carga inicial de combos, validaciones y atajos
     private void inicializarDatosComponentes() {
         DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy | HH:mm");
         vista.getLblFechaHora().setText(LocalDateTime.now().format(formatoFecha));
@@ -270,9 +260,7 @@ public class Controlador {
         Platform.runLater(() -> vista.getTxtCodigoBarras().requestFocus());
     }
 
-    /**
-     * Eventos de la Pestaña 1: Caja / Ventas.
-     */
+    // Eventos de Ventas
     private void configurarEventosVentas() {
         vista.getBtnAgregar().setOnAction(e -> {
             String codigo = vista.getTxtCodigoBarras().getText().trim();
@@ -426,9 +414,7 @@ public class Controlador {
         });
     }
 
-    /**
-     * Eventos de la Pestaña 2: Catálogo de Productos y Categorías.
-     */
+    // Eventos de Productos
     private void configurarEventosProductos() {
         // Doble clic en producto para llevarlo a la venta
         vista.getTblCatalogoProductos().setOnMouseClicked(e -> {
@@ -507,9 +493,7 @@ public class Controlador {
         });
     }
 
-    /**
-     * Muestra diálogo modal para alta o modificación de producto.
-     */
+    // Dialogo para alta o edicion de producto
     private void mostrarDialogoProducto(Producto existente) {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle(existente == null ? "Registrar Nuevo Producto" : "Modificar Producto");
@@ -578,9 +562,7 @@ public class Controlador {
         }
     }
 
-    /**
-     * Eventos de la Pestaña 3: Inventario y Stock.
-     */
+    // Eventos de Inventario
     private void configurarEventosInventario() {
         vista.getChkSoloBajoStock().setOnAction(e -> {
             boolean bajo = vista.getChkSoloBajoStock().isSelected();
@@ -670,9 +652,7 @@ public class Controlador {
         });
     }
 
-    /**
-     * Eventos de la Pestaña 4: Devoluciones.
-     */
+    // Eventos de Devoluciones
     private void configurarEventosDevoluciones() {
         vista.getBtnBuscarTicketDevolucion().setOnAction(e -> {
             String folio = vista.getTxtFolioDevolucion().getText().trim();
@@ -740,9 +720,7 @@ public class Controlador {
         });
     }
 
-    /**
-     * Eventos de la Pestaña 5: Reportes del Sistema.
-     */
+    // Eventos de Reportes
     private void configurarEventosReportes() {
         vista.getBtnVistaPreviaReporte().setOnAction(e -> {
             String rep = vista.getCmbTipoReporte().getValue();

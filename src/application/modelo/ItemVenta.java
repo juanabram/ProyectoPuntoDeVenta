@@ -7,10 +7,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-/**
- * Modelo de Entidad: ItemVenta
- * Representa una fila en el carrito de la venta en curso (tblProductos).
- */
+// Fila de producto en el carrito de venta
 public class ItemVenta {
 
     private final IntegerProperty numero = new SimpleIntegerProperty();

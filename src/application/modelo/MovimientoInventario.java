@@ -7,10 +7,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-/**
- * Modelo de Entidad: MovimientoInventario
- * Registra entradas, salidas y ajustes de existencias en el almacén.
- */
+// Registro de entradas, salidas y ajustes de stock
 public class MovimientoInventario {
 
     private final StringProperty codigo = new SimpleStringProperty();

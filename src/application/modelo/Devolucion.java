@@ -4,10 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Modelo de Entidad: Devolucion
- * Representa una nota de crédito o comprobante de devolución.
- */
+// Comprobante de devolucion y reembolso
 public class Devolucion {
 
     private String folioDevolucion;

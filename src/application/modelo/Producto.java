@@ -7,10 +7,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-/**
- * Modelo de Entidad: Producto
- * Representa un artículo del catálogo del Punto de Venta.
- */
+// Articulo del catalogo del punto de venta
 public class Producto {
 
     private final StringProperty codigo = new SimpleStringProperty();

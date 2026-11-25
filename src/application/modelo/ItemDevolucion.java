@@ -7,10 +7,7 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-/**
- * Modelo de Entidad: ItemDevolucion
- * Representa un artículo que se devuelve en la pestaña Devoluciones.
- */
+// Fila de articulo en la tabla de devoluciones
 public class ItemDevolucion {
 
     private final StringProperty codigo = new SimpleStringProperty();

@@ -6,9 +6,7 @@ import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Servicio de Lógica de Negocio: Control de Inventario y Alertas de Stock
- */
+// Control de existencias, movimientos y alertas de stock
 public class ServicioInventario {
 
     private final RepositorioDatos repo = RepositorioDatos.getInstancia();

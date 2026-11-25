@@ -8,10 +8,7 @@ import application.modelo.Producto;
 import application.modelo.Venta;
 import application.modelo.datos.RepositorioDatos;
 
-/**
- * Servicio de Lógica de Negocio: Generación de Reportes del Sistema
- * Preparado para emitir datos formateados y exportación.
- */
+// Generacion de reportes en texto para vista previa y exportacion
 public class ServicioReportes {
 
     private final RepositorioDatos repo = RepositorioDatos.getInstancia();

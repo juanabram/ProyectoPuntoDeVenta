@@ -15,31 +15,21 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 
-/**
- * Clase VistaControlador:
- * Contiene las declaraciones de los elementos visuales (@FXML) de todas las pestañas
- * y sus métodos de acceso (getters y setters).
- */
+// Referencias FXML de los controles de la ventana principal
 public class VistaControlador {
 
-    // ==========================================
-    // MENÚ SUPERIOR
-    // ==========================================
+    // Menu superior
     @FXML private MenuItem menuNuevaVenta;
     @FXML private MenuItem menuCancelarVenta;
     @FXML private MenuItem menuSalir;
     @FXML private MenuItem menuAtajos;
     @FXML private MenuItem menuAcercaDe;
 
-    // ==========================================
-    // ENCABEZADO DE SESIÓN
-    // ==========================================
+    // Encabezado
     @FXML private Label lblSesion;
     @FXML private Label lblFechaHora;
 
-    // ==========================================
-    // TABPANE PRINCIPAL Y PESTAÑAS
-    // ==========================================
+    // Pestanas
     @FXML private TabPane tabPanePrincipal;
     @FXML private Tab tabVentas;
     @FXML private Tab tabProductos;
@@ -47,9 +37,7 @@ public class VistaControlador {
     @FXML private Tab tabDevoluciones;
     @FXML private Tab tabReportes;
 
-    // ==========================================
-    // PESTAÑA 1: CAJA / VENTAS
-    // ==========================================
+    // Ventas
     @FXML private TextField txtCodigoBarras;
     @FXML private TextField txtCantidad;
     @FXML private Button btnAgregar;
@@ -81,9 +69,7 @@ public class VistaControlador {
     @FXML private CheckBox chkTicket;
     @FXML private Button btnCobrar;
 
-    // ==========================================
-    // PESTAÑA 2: PRODUCTOS Y CATEGORÍAS
-    // ==========================================
+    // Productos y categorias
     @FXML private TextField txtBuscarCatalogo;
     @FXML private ComboBox<String> cmbFiltroCategoria;
     @FXML private Button btnFiltrarProductos;
@@ -106,9 +92,7 @@ public class VistaControlador {
     @FXML private Button btnAdministrarImagenes;
     @FXML private Label lblTotalProductosRegistrados;
 
-    // ==========================================
-    // PESTAÑA 3: INVENTARIO Y STOCK
-    // ==========================================
+    // Inventario
     @FXML private ComboBox<String> cmbFiltroInventario;
     @FXML private CheckBox chkSoloBajoStock;
     @FXML private Button btnRefrescarInventario;
@@ -127,9 +111,7 @@ public class VistaControlador {
     @FXML private Button btnAjusteStock;
     @FXML private Button btnGenerarReporteStock;
 
-    // ==========================================
-    // PESTAÑA 4: DEVOLUCIONES
-    // ==========================================
+    // Devoluciones
     @FXML private TextField txtFolioDevolucion;
     @FXML private Button btnBuscarTicketDevolucion;
     @FXML private Label lblInfoTicketDevolucion;
@@ -146,9 +128,7 @@ public class VistaControlador {
     @FXML private CheckBox chkReintegrarStock;
     @FXML private Button btnProcesarDevolucion;
 
-    // ==========================================
-    // PESTAÑA 5: REPORTES (JASPERREPORTS)
-    // ==========================================
+    // Reportes
     @FXML private ComboBox<String> cmbTipoReporte;
     @FXML private DatePicker dpFechaInicio;
     @FXML private DatePicker dpFechaFin;
@@ -158,16 +138,12 @@ public class VistaControlador {
     @FXML private Label lblEstadoReporte;
     @FXML private TextArea txtDetallesReporte;
 
-    // ==========================================
-    // BARRA INFERIOR (ESTADO Y ALERTAS)
-    // ==========================================
+    // Barra inferior
     @FXML private Label lblAlertaStock;
     @FXML private Separator sepAlertaStock;
     @FXML private Label lblMensajeEstado;
 
-    // ==========================================
-    // GETTERS Y SETTERS
-    // ==========================================
+    // Getters y setters
 
     public MenuItem getMenuNuevaVenta() { return menuNuevaVenta; }
     public MenuItem getMenuCancelarVenta() { return menuCancelarVenta; }

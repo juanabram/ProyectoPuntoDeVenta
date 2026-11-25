@@ -6,9 +6,7 @@ import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Servicio de Lógica de Negocio: Catálogo de Productos y Categorías
- */
+// Administracion del catalogo de productos
 public class ServicioProductos {
 
     private final RepositorioDatos repo = RepositorioDatos.getInstancia();

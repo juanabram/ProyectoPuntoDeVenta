@@ -10,9 +10,7 @@ import application.modelo.datos.RepositorioDatos;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Servicio de Lógica de Negocio: Ventas y Cobro POS
- */
+// Manejo del carrito, calculo de totales y cobro de ventas
 public class ServicioVentas {
 
     private final RepositorioDatos repo = RepositorioDatos.getInstancia();
@@ -146,9 +144,7 @@ public class ServicioVentas {
         return base + calcularIVA();
     }
 
-    /**
-     * Procesa y registra la venta liquidada.
-     */
+    // Registra la venta y limpia el carrito
     public synchronized Venta liquidarVenta(String metodoPago, double pagaCon, boolean imprimirTicket) throws IllegalArgumentException {
         if (carrito.isEmpty()) {
             throw new IllegalArgumentException("El carrito de venta está vacío.");
@@ -174,9 +170,7 @@ public class ServicioVentas {
         return venta;
     }
 
-    /**
-     * Genera el formato de ticket en texto para impresión o consulta.
-     */
+    // Arma el ticket en texto plano
     public String generarTextoTicket(Venta v) {
         StringBuilder sb = new StringBuilder();
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
