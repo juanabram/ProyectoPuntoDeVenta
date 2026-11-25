@@ -224,6 +224,14 @@ public class VistaControlador {
     public Button getBtnFiltrarProductos() { return btnFiltrarProductos; }
     public Button getBtnRecargarCatalogo() { return btnRecargarCatalogo; }
     @SuppressWarnings("rawtypes") public TableView getTblCatalogoProductos() { return tblCatalogoProductos; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatCodigo() { return colCatCodigo; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatNombre() { return colCatNombre; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatCategoria() { return colCatCategoria; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatSubcategoria() { return colCatSubcategoria; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatPrecio() { return colCatPrecio; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatStock() { return colCatStock; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatStockMin() { return colCatStockMin; }
+    @SuppressWarnings("rawtypes") public TableColumn getColCatEstado() { return colCatEstado; }
     public Button getBtnNuevoProducto() { return btnNuevoProducto; }
     public Button getBtnModificarProducto() { return btnModificarProducto; }
     public Button getBtnBajaLogicaProducto() { return btnBajaLogicaProducto; }
@@ -236,6 +244,13 @@ public class VistaControlador {
     public CheckBox getChkSoloBajoStock() { return chkSoloBajoStock; }
     public Button getBtnRefrescarInventario() { return btnRefrescarInventario; }
     @SuppressWarnings("rawtypes") public TableView getTblInventario() { return tblInventario; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvCodigo() { return colInvCodigo; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvProducto() { return colInvProducto; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvCategoria() { return colInvCategoria; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvExistencias() { return colInvExistencias; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvStockMinimo() { return colInvStockMinimo; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvEstado() { return colInvEstado; }
+    @SuppressWarnings("rawtypes") public TableColumn getColInvUltimoMovimiento() { return colInvUltimoMovimiento; }
     public Button getBtnEntradaStock() { return btnEntradaStock; }
     public Button getBtnSalidaStock() { return btnSalidaStock; }
     public Button getBtnAjusteStock() { return btnAjusteStock; }
@@ -246,6 +261,12 @@ public class VistaControlador {
     public Button getBtnBuscarTicketDevolucion() { return btnBuscarTicketDevolucion; }
     public Label getLblInfoTicketDevolucion() { return lblInfoTicketDevolucion; }
     @SuppressWarnings("rawtypes") public TableView getTblDevoluciones() { return tblDevoluciones; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevCodigo() { return colDevCodigo; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevDescripcion() { return colDevDescripcion; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevPrecio() { return colDevPrecio; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevCantComprada() { return colDevCantComprada; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevCantDevolver() { return colDevCantDevolver; }
+    @SuppressWarnings("rawtypes") public TableColumn getColDevSubtotalReembolso() { return colDevSubtotalReembolso; }
     public ComboBox<String> getCmbMotivoDevolucion() { return cmbMotivoDevolucion; }
     public CheckBox getChkReintegrarStock() { return chkReintegrarStock; }
     public Button getBtnProcesarDevolucion() { return btnProcesarDevolucion; }
