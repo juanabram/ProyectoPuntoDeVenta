@@ -2,6 +2,7 @@ package application.Application;
 
 import application.Controlador.Controlador;
 import application.Controlador.VistaControlador;
+import application.modelo.datos.RepositorioDatos;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -31,6 +32,11 @@ public class Main extends Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void stop() {
+        RepositorioDatos.getInstancia().cerrarConexion();
     }
 
     public static void main(String[] args) {

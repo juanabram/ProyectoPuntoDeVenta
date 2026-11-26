@@ -1,19 +1,15 @@
-package application.modelo;
+package application.modelo.datos;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Clase abstracta ConexionBD (misma estructura que ApartadosLabFIT):
- * abre la conexión JDBC al crearse y la cierra con cerrarConexion().
- * Cada motor de base de datos construye su propia URL en una subclase.
- */
+// Clase base para conexiones JDBC; cada motor define su propia URL
 public abstract class ConexionBD {
     private Connection conexion;
-    private String url;
-    private String usuario;
-    private String password;
+    private final String url;
+    private final String usuario;
+    private final String password;
 
     public ConexionBD(String servidor, String baseDatos, String usuario, String password) {
         this.usuario = usuario;
@@ -37,6 +33,14 @@ public abstract class ConexionBD {
         return conexion;
     }
 
+    public boolean estaActiva() {
+        try {
+            return conexion != null && !conexion.isClosed();
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public void cerrarConexion() {
         try {
             if (conexion != null && !conexion.isClosed()) {
@@ -45,6 +49,8 @@ public abstract class ConexionBD {
             }
         } catch (SQLException e) {
             System.err.println("[ERROR] Error al cerrar la conexión: " + e.getMessage());
+        } finally {
+            conexion = null;
         }
     }
 }

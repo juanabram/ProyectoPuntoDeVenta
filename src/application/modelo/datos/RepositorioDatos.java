@@ -11,9 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import application.modelo.BaseDatos;
 import application.modelo.Categoria;
-import application.modelo.Conexion_Access;
 import application.modelo.Devolucion;
 import application.modelo.ItemDevolucion;
 import application.modelo.ItemVenta;
@@ -21,8 +19,7 @@ import application.modelo.MovimientoInventario;
 import application.modelo.Producto;
 import application.modelo.Venta;
 
-// Acceso centralizado a datos basado en ApartadosLabFIT:
-// carga inicial desde PuntoDeVenta.accdb y persistencia directa con Conexion_Access + BaseDatos
+// Acceso centralizado a datos sobre PuntoDeVenta.accdb con cache en memoria
 public class RepositorioDatos {
 
     public static final String ARCHIVO_BD = "PuntoDeVenta.accdb";
@@ -30,6 +27,9 @@ public class RepositorioDatos {
     private static final DateTimeFormatter FORMATO_MOVIMIENTO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private static RepositorioDatos instancia;
+
+    private Conexion_Access conexionActiva;
+    private BaseDatos bdActiva;
 
     private final Map<String, Producto> productosMap = new LinkedHashMap<>();
     private final Map<String, Venta> ventasMap = new LinkedHashMap<>();
@@ -45,11 +45,24 @@ public class RepositorioDatos {
     }
 
     private RepositorioDatos() {
-        cargadedatos();
+        cargarDatos();
     }
 
-    public static Conexion_Access abrirConexion() {
-        return new Conexion_Access("", ARCHIVO_BD, "", "");
+    // Reutiliza una sola conexion abierta a Access durante la sesion
+    private synchronized BaseDatos obtenerBaseDatos() {
+        if (conexionActiva == null || !conexionActiva.estaActiva()) {
+            conexionActiva = new Conexion_Access(ARCHIVO_BD);
+            bdActiva = new BaseDatos(conexionActiva.getConexion());
+        }
+        return bdActiva;
+    }
+
+    public synchronized void cerrarConexion() {
+        if (conexionActiva != null) {
+            conexionActiva.cerrarConexion();
+            conexionActiva = null;
+            bdActiva = null;
+        }
     }
 
     public static String texto(String valor) {
@@ -64,26 +77,23 @@ public class RepositorioDatos {
         return (fechaHora != null ? fechaHora : LocalDateTime.now()).format(FORMATO_FECHA);
     }
 
-    // Carga inicial desde PuntoDeVenta.accdb (mismo patron que CIndicadores en ApartadosLabFIT)
-    private void cargadedatos() {
-        Conexion_Access conexion = abrirConexion();
-        BaseDatos bd = new BaseDatos(conexion.getConexion());
+    // Carga inicial desde PuntoDeVenta.accdb hacia memoria
+    private void cargarDatos() {
+        BaseDatos bd = obtenerBaseDatos();
 
         ArrayList<String[]> datosCategorias = bd.consultar("Categorias", "Id, Nombre", "");
         ArrayList<String[]> datosProductos = bd.consultar("Productos",
-                "Codigo, Nombre, Categoria, Subcategoria, Precio, Stock, StockMinimo, Estado, Imagen", "");
+            "Codigo, Nombre, Categoria, Subcategoria, Precio, Stock, StockMinimo, Estado, Imagen", "");
         ArrayList<String[]> datosVentas = bd.consultar("Ventas",
-                "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio", "");
+            "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio", "");
         ArrayList<String[]> datosDetalleVentas = bd.consultar("DetalleVentas ORDER BY Folio, NumeroItem",
-                "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento", "");
+            "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento", "");
         ArrayList<String[]> datosDevoluciones = bd.consultar("Devoluciones",
-                "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso", "");
+            "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso", "");
         ArrayList<String[]> datosDetalleDevoluciones = bd.consultar("DetalleDevoluciones ORDER BY Id",
-                "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta", "");
+            "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta", "");
         ArrayList<String[]> datosMovimientos = bd.consultar("MovimientosInventario ORDER BY Id",
-                "Codigo, Producto, ExistenciasResultantes, Motivo, FechaHora", "");
-
-        conexion.cerrarConexion();
+            "Codigo, Producto, ExistenciasResultantes, Motivo, FechaHora", "");
 
         try {
             for (String[] d : datosCategorias) {
@@ -99,7 +109,7 @@ public class RepositorioDatos {
             Map<String, List<ItemVenta>> itemsPorVenta = new HashMap<>();
             for (String[] d : datosDetalleVentas) {
                 itemsPorVenta.computeIfAbsent(d[0], k -> new ArrayList<>())
-                        .add(new ItemVenta(entero(d[1]), d[2], d[3], decimal(d[4]), entero(d[5]), decimal(d[6])));
+                    .add(new ItemVenta(entero(d[1]), d[2], d[3], decimal(d[4]), entero(d[5]), decimal(d[6])));
             }
             for (String[] d : datosVentas) {
                 Venta v = new Venta();
@@ -121,7 +131,7 @@ public class RepositorioDatos {
             Map<String, List<ItemDevolucion>> itemsPorDevolucion = new HashMap<>();
             for (String[] d : datosDetalleDevoluciones) {
                 itemsPorDevolucion.computeIfAbsent(d[0], k -> new ArrayList<>())
-                        .add(new ItemDevolucion(d[1], d[2], decimal(d[3]), entero(d[4]), entero(d[5])));
+                    .add(new ItemDevolucion(d[1], d[2], decimal(d[3]), entero(d[4]), entero(d[5])));
             }
             for (String[] d : datosDevoluciones) {
                 Devolucion dev = new Devolucion();
@@ -139,11 +149,11 @@ public class RepositorioDatos {
             for (String[] d : datosMovimientos) {
                 Producto p = productosMap.get(d[0]);
                 MovimientoInventario m = new MovimientoInventario(
-                        d[0], d[1],
-                        p != null ? p.getCategoria() : "",
-                        entero(d[2]),
-                        p != null ? p.getStockMinimo() : 0,
-                        d[3]);
+                    d[0], d[1],
+                    p != null ? p.getCategoria() : "",
+                    entero(d[2]),
+                    p != null ? p.getStockMinimo() : 0,
+                    d[3]);
                 m.setUltimoMovimiento(d[3] + " (" + leerFecha(d[4]).format(FORMATO_MOVIMIENTO) + ")");
                 movimientosList.add(m);
             }
@@ -227,10 +237,8 @@ public class RepositorioDatos {
         if (p == null) return false;
         productosMap.put(p.getCodigo(), p);
 
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
+        BaseDatos bd = obtenerBaseDatos();
         if (bd.existe("Productos", "Codigo = " + texto(p.getCodigo()))) {
-            con.cerrarConexion();
             return actualizarProducto(p);
         }
         bd.insertar("Productos",
@@ -240,7 +248,6 @@ public class RepositorioDatos {
                 importe(p.getPrecio()), String.valueOf(p.getStock()), String.valueOf(p.getStockMinimo()),
                 p.getEstado(), p.getImagen() != null ? p.getImagen() : "default.png", fecha(LocalDateTime.now())
             });
-        con.cerrarConexion();
         return true;
     }
 
@@ -249,17 +256,13 @@ public class RepositorioDatos {
         boolean enMemoria = productosMap.containsKey(p.getCodigo());
         if (enMemoria) productosMap.put(p.getCodigo(), p);
 
-        String condicion = "Codigo = " + texto(p.getCodigo());
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-        bd.modificar("Productos", "Nombre", p.getNombre(), condicion);
-        bd.modificar("Productos", "Categoria", p.getCategoria(), condicion);
-        bd.modificar("Productos", "Subcategoria", p.getSubcategoria(), condicion);
-        bd.modificar("Productos", "Precio", importe(p.getPrecio()), condicion);
-        bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), condicion);
-        bd.modificar("Productos", "StockMinimo", String.valueOf(p.getStockMinimo()), condicion);
-        bd.modificar("Productos", "Estado", p.getEstado(), condicion);
-        con.cerrarConexion();
+        obtenerBaseDatos().modificarVarios("Productos",
+            new String[]{ "Nombre", "Categoria", "Subcategoria", "Precio", "Stock", "StockMinimo", "Estado" },
+            new String[]{
+                p.getNombre(), p.getCategoria(), p.getSubcategoria(), importe(p.getPrecio()),
+                String.valueOf(p.getStock()), String.valueOf(p.getStockMinimo()), p.getEstado()
+            },
+            "Codigo = " + texto(p.getCodigo()));
         return enMemoria;
     }
 
@@ -269,10 +272,7 @@ public class RepositorioDatos {
         Producto p = productosMap.get(clave);
         if (p != null) p.setStock(nuevoStock);
 
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-        bd.modificar("Productos", "Stock", String.valueOf(nuevoStock), "Codigo = " + texto(clave));
-        con.cerrarConexion();
+        obtenerBaseDatos().modificar("Productos", "Stock", String.valueOf(nuevoStock), "Codigo = " + texto(clave));
         return p != null;
     }
 
@@ -282,10 +282,7 @@ public class RepositorioDatos {
         Producto p = productosMap.get(clave);
         if (p != null) p.setEstado("Inactivo");
 
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-        bd.modificar("Productos", "Estado", "Inactivo", "Codigo = " + texto(clave));
-        con.cerrarConexion();
+        obtenerBaseDatos().modificar("Productos", "Estado", "Inactivo", "Codigo = " + texto(clave));
         return p != null;
     }
 
@@ -317,42 +314,45 @@ public class RepositorioDatos {
         }
 
         String fechaVenta = fecha(v.getFechaHora());
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-
-        bd.insertar("Ventas", "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio",
-            new String[]{
-                v.getFolio(), fechaVenta, v.getCajero(),
-                importe(v.getSubtotal()), importe(v.getDescuentoTotal()), importe(v.getIva()),
-                importe(v.getTotal()), v.getMetodoPago(), importe(v.getPagaCon()), importe(v.getCambio())
-            });
-
-        for (ItemVenta item : v.getItems()) {
-            bd.insertar("DetalleVentas", "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento, Importe",
+        BaseDatos bd = obtenerBaseDatos();
+        bd.iniciarTransaccion();
+        try {
+            bd.insertar("Ventas", "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio",
                 new String[]{
-                    v.getFolio(), String.valueOf(item.getNumero()), item.getCodigo(), item.getDescripcion(),
-                    importe(item.getPrecio()), String.valueOf(item.getCantidad()),
-                    importe(item.getDescuento()), importe(item.getImporte())
+                    v.getFolio(), fechaVenta, v.getCajero(),
+                    importe(v.getSubtotal()), importe(v.getDescuentoTotal()), importe(v.getIva()),
+                    importe(v.getTotal()), v.getMetodoPago(), importe(v.getPagaCon()), importe(v.getCambio())
                 });
 
-            Producto p = productosMap.get(item.getCodigo());
-            if (p != null) {
-                int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() + item.getCantidad());
-                int resultante = Math.max(0, previo - item.getCantidad());
-                stockPrevio.put(p.getCodigo(), resultante);
-
-                bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
-                bd.insertar("MovimientosInventario",
-                    "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+            for (ItemVenta item : v.getItems()) {
+                bd.insertar("DetalleVentas", "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento, Importe",
                     new String[]{
-                        p.getCodigo(), p.getNombre(), "Salida", String.valueOf(item.getCantidad()),
-                        String.valueOf(previo), String.valueOf(resultante),
-                        "Salida por Venta (" + v.getFolio() + ")", fechaVenta
+                        v.getFolio(), String.valueOf(item.getNumero()), item.getCodigo(), item.getDescripcion(),
+                        importe(item.getPrecio()), String.valueOf(item.getCantidad()),
+                        importe(item.getDescuento()), importe(item.getImporte())
                     });
-            }
-        }
 
-        con.cerrarConexion();
+                Producto p = productosMap.get(item.getCodigo());
+                if (p != null) {
+                    int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() + item.getCantidad());
+                    int resultante = Math.max(0, previo - item.getCantidad());
+                    stockPrevio.put(p.getCodigo(), resultante);
+
+                    bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
+                    bd.insertar("MovimientosInventario",
+                        "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+                        new String[]{
+                            p.getCodigo(), p.getNombre(), "Salida", String.valueOf(item.getCantidad()),
+                            String.valueOf(previo), String.valueOf(resultante),
+                            "Salida por Venta (" + v.getFolio() + ")", fechaVenta
+                        });
+                }
+            }
+            bd.confirmarTransaccion();
+        } catch (Exception e) {
+            bd.revertirTransaccion();
+            System.err.println("[ERROR] Error en transacción de venta: " + e.getMessage());
+        }
         return true;
     }
 
@@ -383,16 +383,13 @@ public class RepositorioDatos {
         if (detalle.toLowerCase().startsWith("entrada")) tipo = "Entrada";
         else if (detalle.toLowerCase().startsWith("salida")) tipo = "Salida";
 
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-        bd.insertar("MovimientosInventario",
+        obtenerBaseDatos().insertar("MovimientosInventario",
             "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
             new String[]{
                 mov.getCodigo(), mov.getProducto(), tipo,
                 String.valueOf(mov.getExistencias()), String.valueOf(mov.getExistencias()),
                 String.valueOf(mov.getExistencias()), detalle, fecha(mov.getFechaHora())
             });
-        con.cerrarConexion();
         return true;
     }
 
@@ -452,42 +449,45 @@ public class RepositorioDatos {
         }
 
         String fechaDev = fecha(dev.getFechaHora());
-        Conexion_Access con = abrirConexion();
-        BaseDatos bd = new BaseDatos(con.getConexion());
-
-        bd.insertar("Devoluciones", "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso",
-            new String[]{
-                dev.getFolioDevolucion(), dev.getFolioVentaOriginal(), fechaDev,
-                dev.getMotivo(), dev.isReintegrarInventario() ? "Si" : "No", importe(dev.getTotalReembolso())
-            });
-
-        for (ItemDevolucion item : dev.getItems()) {
-            bd.insertar("DetalleDevoluciones",
-                "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta, SubtotalReembolso",
+        BaseDatos bd = obtenerBaseDatos();
+        bd.iniciarTransaccion();
+        try {
+            bd.insertar("Devoluciones", "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso",
                 new String[]{
-                    dev.getFolioDevolucion(), item.getCodigo(), item.getDescripcion(), importe(item.getPrecio()),
-                    String.valueOf(item.getCantComprada()), String.valueOf(item.getCantDevolver()),
-                    importe(item.getSubtotalReembolso())
+                    dev.getFolioDevolucion(), dev.getFolioVentaOriginal(), fechaDev,
+                    dev.getMotivo(), dev.isReintegrarInventario() ? "Si" : "No", importe(dev.getTotalReembolso())
                 });
 
-            Producto p = productosMap.get(item.getCodigo());
-            if (dev.isReintegrarInventario() && p != null && item.getCantDevolver() > 0) {
-                int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() - item.getCantDevolver());
-                int resultante = previo + item.getCantDevolver();
-                stockPrevio.put(p.getCodigo(), resultante);
-
-                bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
-                bd.insertar("MovimientosInventario",
-                    "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+            for (ItemDevolucion item : dev.getItems()) {
+                bd.insertar("DetalleDevoluciones",
+                    "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta, SubtotalReembolso",
                     new String[]{
-                        p.getCodigo(), p.getNombre(), "Entrada", String.valueOf(item.getCantDevolver()),
-                        String.valueOf(previo), String.valueOf(resultante),
-                        "Entrada por Devolución (" + dev.getFolioDevolucion() + ")", fechaDev
+                        dev.getFolioDevolucion(), item.getCodigo(), item.getDescripcion(), importe(item.getPrecio()),
+                        String.valueOf(item.getCantComprada()), String.valueOf(item.getCantDevolver()),
+                        importe(item.getSubtotalReembolso())
                     });
-            }
-        }
 
-        con.cerrarConexion();
+                Producto p = productosMap.get(item.getCodigo());
+                if (dev.isReintegrarInventario() && p != null && item.getCantDevolver() > 0) {
+                    int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() - item.getCantDevolver());
+                    int resultante = previo + item.getCantDevolver();
+                    stockPrevio.put(p.getCodigo(), resultante);
+
+                    bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
+                    bd.insertar("MovimientosInventario",
+                        "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+                        new String[]{
+                            p.getCodigo(), p.getNombre(), "Entrada", String.valueOf(item.getCantDevolver()),
+                            String.valueOf(previo), String.valueOf(resultante),
+                            "Entrada por Devolución (" + dev.getFolioDevolucion() + ")", fechaDev
+                        });
+                }
+            }
+            bd.confirmarTransaccion();
+        } catch (Exception e) {
+            bd.revertirTransaccion();
+            System.err.println("[ERROR] Error en transacción de devolución: " + e.getMessage());
+        }
         return true;
     }
 
