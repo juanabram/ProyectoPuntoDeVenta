@@ -1,22 +1,19 @@
 package application.modelo.datos;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import application.modelo.BaseDatos;
 import application.modelo.Categoria;
+import application.modelo.Conexion_Access;
 import application.modelo.Devolucion;
 import application.modelo.ItemDevolucion;
 import application.modelo.ItemVenta;
@@ -24,17 +21,13 @@ import application.modelo.MovimientoInventario;
 import application.modelo.Producto;
 import application.modelo.Venta;
 
-// Acceso centralizado a datos (JDBC con respaldo en memoria)
+// Acceso centralizado a datos basado en ApartadosLabFIT:
+// carga inicial desde PuntoDeVenta.accdb y persistencia directa con Conexion_Access + BaseDatos
 public class RepositorioDatos {
 
-    private static final String SQL_PROD_BASE =
-        "SELECT p.codigo, p.nombre, COALESCE(c.nombre, 'General') AS categoria, " +
-        "p.subcategoria, p.precio, p.stock, p.stock_minimo, p.estado " +
-        "FROM productos p LEFT JOIN categorias c ON p.id_categoria = c.id_categoria";
-    private static final String SQL_VENTAS_BASE =
-        "SELECT folio, fecha_hora, cajero, subtotal, descuento, iva, total, metodo_pago, paga_con, cambio FROM ventas";
-    private static final String SQL_DEV_BASE =
-        "SELECT folio_devolucion, folio_venta_original, fecha_hora, motivo, reintegrar_stock, total_reembolso FROM devoluciones";
+    public static final String ARCHIVO_BD = "PuntoDeVenta.accdb";
+    public static final DateTimeFormatter FORMATO_FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATO_MOVIMIENTO = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     private static RepositorioDatos instancia;
 
@@ -46,26 +39,123 @@ public class RepositorioDatos {
     private int contadorFolioVenta = 1001;
     private int contadorFolioDevolucion = 501;
 
-    @FunctionalInterface
-    private interface RowMapper<T> {
-        T map(Connection conn, ResultSet rs) throws SQLException;
-    }
-
-    @FunctionalInterface
-    private interface SqlTransaction {
-        void run(Connection conn) throws SQLException;
-    }
-
     public static synchronized RepositorioDatos getInstancia() {
         if (instancia == null) instancia = new RepositorioDatos();
         return instancia;
     }
 
     private RepositorioDatos() {
-        inicializarDatosSemilla();
+        cargadedatos();
     }
 
-    private void inicializarDatosSemilla() {
+    public static Conexion_Access abrirConexion() {
+        return new Conexion_Access("", ARCHIVO_BD, "", "");
+    }
+
+    public static String texto(String valor) {
+        return "'" + (valor == null ? "" : valor.replace("'", "''")) + "'";
+    }
+
+    public static String importe(double valor) {
+        return String.format(Locale.US, "%.2f", valor);
+    }
+
+    public static String fecha(LocalDateTime fechaHora) {
+        return (fechaHora != null ? fechaHora : LocalDateTime.now()).format(FORMATO_FECHA);
+    }
+
+    // Carga inicial desde PuntoDeVenta.accdb (mismo patron que CIndicadores en ApartadosLabFIT)
+    private void cargadedatos() {
+        Conexion_Access conexion = abrirConexion();
+        BaseDatos bd = new BaseDatos(conexion.getConexion());
+
+        ArrayList<String[]> datosCategorias = bd.consultar("Categorias", "Id, Nombre", "");
+        ArrayList<String[]> datosProductos = bd.consultar("Productos",
+                "Codigo, Nombre, Categoria, Subcategoria, Precio, Stock, StockMinimo, Estado, Imagen", "");
+        ArrayList<String[]> datosVentas = bd.consultar("Ventas",
+                "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio", "");
+        ArrayList<String[]> datosDetalleVentas = bd.consultar("DetalleVentas ORDER BY Folio, NumeroItem",
+                "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento", "");
+        ArrayList<String[]> datosDevoluciones = bd.consultar("Devoluciones",
+                "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso", "");
+        ArrayList<String[]> datosDetalleDevoluciones = bd.consultar("DetalleDevoluciones ORDER BY Id",
+                "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta", "");
+        ArrayList<String[]> datosMovimientos = bd.consultar("MovimientosInventario ORDER BY Id",
+                "Codigo, Producto, ExistenciasResultantes, Motivo, FechaHora", "");
+
+        conexion.cerrarConexion();
+
+        try {
+            for (String[] d : datosCategorias) {
+                categoriasList.add(new Categoria(entero(d[0]), d[1]));
+            }
+
+            for (String[] d : datosProductos) {
+                Producto p = new Producto(d[0], d[1], d[2], d[3], decimal(d[4]), entero(d[5]), entero(d[6]), d[7]);
+                if (d[8] != null && !d[8].isEmpty()) p.setImagen(d[8]);
+                productosMap.put(p.getCodigo(), p);
+            }
+
+            Map<String, List<ItemVenta>> itemsPorVenta = new HashMap<>();
+            for (String[] d : datosDetalleVentas) {
+                itemsPorVenta.computeIfAbsent(d[0], k -> new ArrayList<>())
+                        .add(new ItemVenta(entero(d[1]), d[2], d[3], decimal(d[4]), entero(d[5]), decimal(d[6])));
+            }
+            for (String[] d : datosVentas) {
+                Venta v = new Venta();
+                v.setFolio(d[0]);
+                v.setFechaHora(leerFecha(d[1]));
+                v.setCajero(d[2]);
+                v.setSubtotal(decimal(d[3]));
+                v.setDescuentoTotal(decimal(d[4]));
+                v.setIva(decimal(d[5]));
+                v.setTotal(decimal(d[6]));
+                v.setMetodoPago(d[7]);
+                v.setPagaCon(decimal(d[8]));
+                v.setCambio(decimal(d[9]));
+                v.setItems(itemsPorVenta.getOrDefault(d[0], new ArrayList<>()));
+                ventasMap.put(v.getFolio(), v);
+                contadorFolioVenta = Math.max(contadorFolioVenta, numeroFolio(d[0], "TKT-") + 1);
+            }
+
+            Map<String, List<ItemDevolucion>> itemsPorDevolucion = new HashMap<>();
+            for (String[] d : datosDetalleDevoluciones) {
+                itemsPorDevolucion.computeIfAbsent(d[0], k -> new ArrayList<>())
+                        .add(new ItemDevolucion(d[1], d[2], decimal(d[3]), entero(d[4]), entero(d[5])));
+            }
+            for (String[] d : datosDevoluciones) {
+                Devolucion dev = new Devolucion();
+                dev.setFolioDevolucion(d[0]);
+                dev.setFolioVentaOriginal(d[1]);
+                dev.setFechaHora(leerFecha(d[2]));
+                dev.setMotivo(d[3]);
+                dev.setReintegrarInventario("Si".equalsIgnoreCase(d[4]) || "true".equalsIgnoreCase(d[4]));
+                dev.setTotalReembolso(decimal(d[5]));
+                dev.setItems(itemsPorDevolucion.getOrDefault(d[0], new ArrayList<>()));
+                devolucionesMap.put(dev.getFolioDevolucion(), dev);
+                contadorFolioDevolucion = Math.max(contadorFolioDevolucion, numeroFolio(d[0], "DEV-") + 1);
+            }
+
+            for (String[] d : datosMovimientos) {
+                Producto p = productosMap.get(d[0]);
+                MovimientoInventario m = new MovimientoInventario(
+                        d[0], d[1],
+                        p != null ? p.getCategoria() : "",
+                        entero(d[2]),
+                        p != null ? p.getStockMinimo() : 0,
+                        d[3]);
+                m.setUltimoMovimiento(d[3] + " (" + leerFecha(d[4]).format(FORMATO_MOVIMIENTO) + ")");
+                movimientosList.add(m);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if (categoriasList.isEmpty()) inicializarCategorias();
+        if (productosMap.isEmpty()) inicializarProductosSemilla();
+    }
+
+    private void inicializarCategorias() {
         String[] cats = {
             "Bebidas", "Lácteos", "Botanas", "Panadería", "Enlatados", "Limpieza", "Higiene Personal",
             "Farmacia", "Dulcería", "Carnes Frías", "Frutas y Verduras", "Mascotas", "Papelería",
@@ -73,7 +163,9 @@ public class RepositorioDatos {
             "Despensa General", "Snacks y Confitería"
         };
         for (int i = 0; i < cats.length; i++) categoriasList.add(new Categoria(i + 1, cats[i]));
+    }
 
+    private void inicializarProductosSemilla() {
         Producto[] semilla = {
             new Producto("7501055310884", "Coca Cola Original 600ml", "Bebidas", "Refrescos", 19.50, 48, 10, "Activo"),
             new Producto("7501055300076", "Agua Ciel Purificada 1L", "Bebidas", "Aguas", 14.00, 35, 8, "Activo"),
@@ -102,28 +194,24 @@ public class RepositorioDatos {
     // Productos
 
     public synchronized List<Producto> listarTodosProductos() {
-        return consultarConRespaldo(SQL_PROD_BASE, this::mapearProducto, () -> new ArrayList<>(productosMap.values()));
+        return new ArrayList<>(productosMap.values());
     }
 
     public synchronized List<Producto> listarProductosActivos() {
-        return consultarConRespaldo(SQL_PROD_BASE + " WHERE p.estado = 'Activo'", this::mapearProducto,
-            () -> productosMap.values().stream()
-                .filter(p -> "Activo".equalsIgnoreCase(p.getEstado()))
-                .collect(Collectors.toList()));
+        return productosMap.values().stream()
+            .filter(p -> "Activo".equalsIgnoreCase(p.getEstado()))
+            .collect(Collectors.toList());
     }
 
     public synchronized List<Producto> listarProductosCriticos() {
-        return consultarConRespaldo(SQL_PROD_BASE + " WHERE p.stock <= p.stock_minimo AND p.estado = 'Activo'", this::mapearProducto,
-            () -> productosMap.values().stream()
-                .filter(p -> p.isBajoStock() && "Activo".equalsIgnoreCase(p.getEstado()))
-                .collect(Collectors.toList()));
+        return productosMap.values().stream()
+            .filter(p -> p.isBajoStock() && "Activo".equalsIgnoreCase(p.getEstado()))
+            .collect(Collectors.toList());
     }
 
     public synchronized Producto buscarProductoPorCodigo(String codigo) {
         if (codigo == null || codigo.trim().isEmpty()) return null;
-        String clave = codigo.trim();
-        List<Producto> bd = consultarLista(SQL_PROD_BASE + " WHERE p.codigo = ?", this::mapearProducto, clave);
-        return (bd != null && !bd.isEmpty()) ? bd.get(0) : productosMap.get(clave);
+        return productosMap.get(codigo.trim());
     }
 
     public synchronized List<Producto> buscarProductosPorCriterio(String texto, String categoria) {
@@ -131,33 +219,48 @@ public class RepositorioDatos {
         boolean filtrarCat = categoria != null && !categoria.isEmpty() && !categoria.equalsIgnoreCase("Todas las categorías");
         return listarTodosProductos().stream()
             .filter(p -> txt.isEmpty() || p.getCodigo().toLowerCase().contains(txt) || p.getNombre().toLowerCase().contains(txt))
-            .filter(p -> !filtrarCat || p.getCategoria().equalsIgnoreCase(categoria))
+            .filter(p -> !filtrarCat || (p.getCategoria() != null && p.getCategoria().equalsIgnoreCase(categoria)))
             .collect(Collectors.toList());
     }
 
     public synchronized boolean insertarProducto(Producto p) {
         if (p == null) return false;
         productosMap.put(p.getCodigo(), p);
-        Boolean res = ejecutarConConexion(conn -> {
-            Integer idCat = resolverIdCategoria(conn, p.getCategoria());
-            String sql = "INSERT INTO productos (codigo, nombre, id_categoria, subcategoria, precio, stock, stock_minimo, estado, imagen) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            return ejecutarUpdate(conn, sql, p.getCodigo(), p.getNombre(), idCat, p.getSubcategoria(),
-                p.getPrecio(), p.getStock(), p.getStockMinimo(), p.getEstado(), p.getImagen());
-        });
-        return res != null ? res : true;
+
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+        if (bd.existe("Productos", "Codigo = " + texto(p.getCodigo()))) {
+            con.cerrarConexion();
+            return actualizarProducto(p);
+        }
+        bd.insertar("Productos",
+            "Codigo, Nombre, Categoria, Subcategoria, Precio, Stock, StockMinimo, Estado, Imagen, FechaRegistro",
+            new String[]{
+                p.getCodigo(), p.getNombre(), p.getCategoria(), p.getSubcategoria(),
+                importe(p.getPrecio()), String.valueOf(p.getStock()), String.valueOf(p.getStockMinimo()),
+                p.getEstado(), p.getImagen() != null ? p.getImagen() : "default.png", fecha(LocalDateTime.now())
+            });
+        con.cerrarConexion();
+        return true;
     }
 
     public synchronized boolean actualizarProducto(Producto p) {
         if (p == null) return false;
         boolean enMemoria = productosMap.containsKey(p.getCodigo());
         if (enMemoria) productosMap.put(p.getCodigo(), p);
-        Boolean res = ejecutarConConexion(conn -> {
-            Integer idCat = resolverIdCategoria(conn, p.getCategoria());
-            String sql = "UPDATE productos SET nombre = ?, id_categoria = ?, subcategoria = ?, precio = ?, stock = ?, stock_minimo = ?, estado = ? WHERE codigo = ?";
-            return ejecutarUpdate(conn, sql, p.getNombre(), idCat, p.getSubcategoria(),
-                p.getPrecio(), p.getStock(), p.getStockMinimo(), p.getEstado(), p.getCodigo());
-        });
-        return res != null ? res : enMemoria;
+
+        String condicion = "Codigo = " + texto(p.getCodigo());
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+        bd.modificar("Productos", "Nombre", p.getNombre(), condicion);
+        bd.modificar("Productos", "Categoria", p.getCategoria(), condicion);
+        bd.modificar("Productos", "Subcategoria", p.getSubcategoria(), condicion);
+        bd.modificar("Productos", "Precio", importe(p.getPrecio()), condicion);
+        bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), condicion);
+        bd.modificar("Productos", "StockMinimo", String.valueOf(p.getStockMinimo()), condicion);
+        bd.modificar("Productos", "Estado", p.getEstado(), condicion);
+        con.cerrarConexion();
+        return enMemoria;
     }
 
     public synchronized boolean actualizarStock(String codigo, int nuevoStock) {
@@ -165,8 +268,12 @@ public class RepositorioDatos {
         String clave = codigo.trim();
         Producto p = productosMap.get(clave);
         if (p != null) p.setStock(nuevoStock);
-        Boolean res = ejecutarConConexion(conn -> ejecutarUpdate(conn, "UPDATE productos SET stock = ? WHERE codigo = ?", nuevoStock, clave));
-        return res != null ? res : (p != null);
+
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+        bd.modificar("Productos", "Stock", String.valueOf(nuevoStock), "Codigo = " + texto(clave));
+        con.cerrarConexion();
+        return p != null;
     }
 
     public synchronized boolean bajaLogicaProducto(String codigo) {
@@ -174,8 +281,12 @@ public class RepositorioDatos {
         String clave = codigo.trim();
         Producto p = productosMap.get(clave);
         if (p != null) p.setEstado("Inactivo");
-        Boolean res = ejecutarConConexion(conn -> ejecutarUpdate(conn, "UPDATE productos SET estado = 'Inactivo' WHERE codigo = ?", clave));
-        return res != null ? res : (p != null);
+
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+        bd.modificar("Productos", "Estado", "Inactivo", "Codigo = " + texto(clave));
+        con.cerrarConexion();
+        return p != null;
     }
 
     // Ventas
@@ -186,6 +297,14 @@ public class RepositorioDatos {
 
     public synchronized boolean registrarVenta(Venta v) {
         if (v == null) return false;
+        Map<String, Integer> stockPrevio = new HashMap<>();
+        for (ItemVenta item : v.getItems()) {
+            Producto p = productosMap.get(item.getCodigo());
+            if (p != null && !stockPrevio.containsKey(p.getCodigo())) {
+                stockPrevio.put(p.getCodigo(), p.getStock());
+            }
+        }
+
         ventasMap.put(v.getFolio(), v);
         for (ItemVenta item : v.getItems()) {
             Producto p = productosMap.get(item.getCodigo());
@@ -196,34 +315,54 @@ public class RepositorioDatos {
                     nuevo, p.getStockMinimo(), "Salida por Venta (" + v.getFolio() + ")"));
             }
         }
-        ejecutarTransaccion(conn -> {
-            ejecutarUpdate(conn,
-                "INSERT INTO ventas (folio, fecha_hora, cajero, subtotal, descuento, iva, total, metodo_pago, paga_con, cambio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                v.getFolio(), v.getFechaHora(), v.getCajero(), v.getSubtotal(), v.getDescuentoTotal(),
-                v.getIva(), v.getTotal(), v.getMetodoPago(), v.getPagaCon(), v.getCambio());
-            for (ItemVenta item : v.getItems()) {
-                ejecutarUpdate(conn,
-                    "INSERT INTO detalle_ventas (folio_venta, numero_item, codigo_producto, descripcion, precio_unitario, cantidad, descuento, importe) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    v.getFolio(), item.getNumero(), item.getCodigo(), item.getDescripcion(),
-                    item.getPrecio(), item.getCantidad(), item.getDescuento(), item.getImporte());
-                ejecutarUpdate(conn,
-                    "UPDATE productos SET stock = CASE WHEN stock - ? < 0 THEN 0 ELSE stock - ? END WHERE codigo = ?",
-                    item.getCantidad(), item.getCantidad(), item.getCodigo());
+
+        String fechaVenta = fecha(v.getFechaHora());
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+
+        bd.insertar("Ventas", "Folio, FechaHora, Cajero, Subtotal, Descuento, Iva, Total, MetodoPago, PagaCon, Cambio",
+            new String[]{
+                v.getFolio(), fechaVenta, v.getCajero(),
+                importe(v.getSubtotal()), importe(v.getDescuentoTotal()), importe(v.getIva()),
+                importe(v.getTotal()), v.getMetodoPago(), importe(v.getPagaCon()), importe(v.getCambio())
+            });
+
+        for (ItemVenta item : v.getItems()) {
+            bd.insertar("DetalleVentas", "Folio, NumeroItem, Codigo, Descripcion, Precio, Cantidad, Descuento, Importe",
+                new String[]{
+                    v.getFolio(), String.valueOf(item.getNumero()), item.getCodigo(), item.getDescripcion(),
+                    importe(item.getPrecio()), String.valueOf(item.getCantidad()),
+                    importe(item.getDescuento()), importe(item.getImporte())
+                });
+
+            Producto p = productosMap.get(item.getCodigo());
+            if (p != null) {
+                int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() + item.getCantidad());
+                int resultante = Math.max(0, previo - item.getCantidad());
+                stockPrevio.put(p.getCodigo(), resultante);
+
+                bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
+                bd.insertar("MovimientosInventario",
+                    "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+                    new String[]{
+                        p.getCodigo(), p.getNombre(), "Salida", String.valueOf(item.getCantidad()),
+                        String.valueOf(previo), String.valueOf(resultante),
+                        "Salida por Venta (" + v.getFolio() + ")", fechaVenta
+                    });
             }
-        });
+        }
+
+        con.cerrarConexion();
         return true;
     }
 
     public synchronized Venta buscarVentaPorFolio(String folio) {
         if (folio == null || folio.trim().isEmpty()) return null;
-        String clave = folio.trim();
-        List<Venta> bd = consultarLista(SQL_VENTAS_BASE + " WHERE folio = ?", this::mapearVenta, clave);
-        return (bd != null && !bd.isEmpty()) ? bd.get(0) : ventasMap.get(clave);
+        return ventasMap.get(folio.trim());
     }
 
     public synchronized List<Venta> listarVentas() {
-        return consultarConRespaldo(SQL_VENTAS_BASE + " ORDER BY fecha_hora DESC", this::mapearVenta,
-            () -> new ArrayList<>(ventasMap.values()));
+        return new ArrayList<>(ventasMap.values());
     }
 
     public synchronized List<Venta> listarVentasPorRango(LocalDate inicio, LocalDate fin) {
@@ -238,19 +377,38 @@ public class RepositorioDatos {
     public synchronized boolean registrarMovimiento(MovimientoInventario mov) {
         if (mov == null) return false;
         movimientosList.add(mov);
+
         String detalle = mov.getUltimoMovimiento() != null ? mov.getUltimoMovimiento() : "Ajuste";
-        String tipo = detalle.length() > 50 ? detalle.substring(0, 50) : detalle;
-        LocalDateTime fecha = mov.getFechaHora() != null ? mov.getFechaHora() : LocalDateTime.now();
-        Boolean res = ejecutarConConexion(conn -> ejecutarUpdate(conn,
-            "INSERT INTO movimientos_inventario (codigo_producto, tipo, cantidad, existencias_previas, existencias_resultantes, motivo, fecha_hora) VALUES (?, ?, ?, ?, ?, ?, ?)",
-            mov.getCodigo(), tipo, mov.getExistencias(), mov.getExistencias(), mov.getExistencias(), detalle, fecha));
-        return res != null ? res : true;
+        String tipo = "Ajuste";
+        if (detalle.toLowerCase().startsWith("entrada")) tipo = "Entrada";
+        else if (detalle.toLowerCase().startsWith("salida")) tipo = "Salida";
+
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+        bd.insertar("MovimientosInventario",
+            "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+            new String[]{
+                mov.getCodigo(), mov.getProducto(), tipo,
+                String.valueOf(mov.getExistencias()), String.valueOf(mov.getExistencias()),
+                String.valueOf(mov.getExistencias()), detalle, fecha(mov.getFechaHora())
+            });
+        con.cerrarConexion();
+        return true;
     }
 
     public synchronized List<MovimientoInventario> listarExistencias() {
+        Map<String, String> ultimos = new HashMap<>();
+        for (MovimientoInventario m : movimientosList) {
+            ultimos.put(m.getCodigo(), m.getUltimoMovimiento());
+        }
         return listarTodosProductos().stream()
-            .map(p -> new MovimientoInventario(p.getCodigo(), p.getNombre(), p.getCategoria(),
-                p.getStock(), p.getStockMinimo(), "Consulta Existencias"))
+            .map(p -> {
+                String ultimo = ultimos.getOrDefault(p.getCodigo(), "Consulta Existencias");
+                MovimientoInventario item = new MovimientoInventario(p.getCodigo(), p.getNombre(), p.getCategoria(),
+                    p.getStock(), p.getStockMinimo(), ultimo);
+                if (ultimos.containsKey(p.getCodigo())) item.setUltimoMovimiento(ultimo);
+                return item;
+            })
             .collect(Collectors.toList());
     }
 
@@ -272,6 +430,14 @@ public class RepositorioDatos {
 
     public synchronized boolean registrarDevolucion(Devolucion dev) {
         if (dev == null) return false;
+        Map<String, Integer> stockPrevio = new HashMap<>();
+        for (ItemDevolucion item : dev.getItems()) {
+            Producto p = productosMap.get(item.getCodigo());
+            if (p != null && !stockPrevio.containsKey(p.getCodigo())) {
+                stockPrevio.put(p.getCodigo(), p.getStock());
+            }
+        }
+
         devolucionesMap.put(dev.getFolioDevolucion(), dev);
         if (dev.isReintegrarInventario()) {
             for (ItemDevolucion item : dev.getItems()) {
@@ -284,163 +450,88 @@ public class RepositorioDatos {
                 }
             }
         }
-        ejecutarTransaccion(conn -> {
-            ejecutarUpdate(conn,
-                "INSERT INTO devoluciones (folio_devolucion, folio_venta_original, fecha_hora, motivo, reintegrar_stock, total_reembolso) VALUES (?, ?, ?, ?, ?, ?)",
-                dev.getFolioDevolucion(), dev.getFolioVentaOriginal(), dev.getFechaHora(),
-                dev.getMotivo(), dev.isReintegrarInventario(), dev.getTotalReembolso());
-            for (ItemDevolucion item : dev.getItems()) {
-                ejecutarUpdate(conn,
-                    "INSERT INTO detalle_devoluciones (folio_devolucion, codigo_producto, descripcion, precio, cantidad_comprada, cantidad_devuelta, subtotal_reembolso) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    dev.getFolioDevolucion(), item.getCodigo(), item.getDescripcion(), item.getPrecio(),
-                    item.getCantComprada(), item.getCantDevolver(), item.getSubtotalReembolso());
-                if (dev.isReintegrarInventario()) {
-                    ejecutarUpdate(conn, "UPDATE productos SET stock = stock + ? WHERE codigo = ?",
-                        item.getCantDevolver(), item.getCodigo());
-                }
+
+        String fechaDev = fecha(dev.getFechaHora());
+        Conexion_Access con = abrirConexion();
+        BaseDatos bd = new BaseDatos(con.getConexion());
+
+        bd.insertar("Devoluciones", "FolioDevolucion, FolioVenta, FechaHora, Motivo, ReintegrarStock, TotalReembolso",
+            new String[]{
+                dev.getFolioDevolucion(), dev.getFolioVentaOriginal(), fechaDev,
+                dev.getMotivo(), dev.isReintegrarInventario() ? "Si" : "No", importe(dev.getTotalReembolso())
+            });
+
+        for (ItemDevolucion item : dev.getItems()) {
+            bd.insertar("DetalleDevoluciones",
+                "FolioDevolucion, Codigo, Descripcion, Precio, CantidadComprada, CantidadDevuelta, SubtotalReembolso",
+                new String[]{
+                    dev.getFolioDevolucion(), item.getCodigo(), item.getDescripcion(), importe(item.getPrecio()),
+                    String.valueOf(item.getCantComprada()), String.valueOf(item.getCantDevolver()),
+                    importe(item.getSubtotalReembolso())
+                });
+
+            Producto p = productosMap.get(item.getCodigo());
+            if (dev.isReintegrarInventario() && p != null && item.getCantDevolver() > 0) {
+                int previo = stockPrevio.getOrDefault(p.getCodigo(), p.getStock() - item.getCantDevolver());
+                int resultante = previo + item.getCantDevolver();
+                stockPrevio.put(p.getCodigo(), resultante);
+
+                bd.modificar("Productos", "Stock", String.valueOf(p.getStock()), "Codigo = " + texto(p.getCodigo()));
+                bd.insertar("MovimientosInventario",
+                    "Codigo, Producto, Tipo, Cantidad, ExistenciasPrevias, ExistenciasResultantes, Motivo, FechaHora",
+                    new String[]{
+                        p.getCodigo(), p.getNombre(), "Entrada", String.valueOf(item.getCantDevolver()),
+                        String.valueOf(previo), String.valueOf(resultante),
+                        "Entrada por Devolución (" + dev.getFolioDevolucion() + ")", fechaDev
+                    });
             }
-        });
+        }
+
+        con.cerrarConexion();
         return true;
     }
 
     public synchronized Devolucion buscarDevolucionPorFolio(String folio) {
         if (folio == null || folio.trim().isEmpty()) return null;
-        String clave = folio.trim();
-        List<Devolucion> bd = consultarLista(SQL_DEV_BASE + " WHERE folio_devolucion = ?", this::mapearDevolucion, clave);
-        return (bd != null && !bd.isEmpty()) ? bd.get(0) : devolucionesMap.get(clave);
+        return devolucionesMap.get(folio.trim());
     }
 
     public synchronized List<Devolucion> listarDevoluciones() {
-        return consultarConRespaldo(SQL_DEV_BASE + " ORDER BY fecha_hora DESC", this::mapearDevolucion,
-            () -> new ArrayList<>(devolucionesMap.values()));
+        return new ArrayList<>(devolucionesMap.values());
     }
 
     public synchronized List<Categoria> obtenerCategorias() {
-        List<Categoria> bd = consultarLista("SELECT id_categoria, nombre FROM categorias ORDER BY id_categoria",
-            (conn, rs) -> new Categoria(rs.getInt("id_categoria"), rs.getString("nombre")));
-        return (bd != null && !bd.isEmpty()) ? bd : new ArrayList<>(categoriasList);
+        return new ArrayList<>(categoriasList);
     }
 
-    // Helpers JDBC y mapeadores
+    // Conversiones seguras
 
-    private <T> List<T> consultarConRespaldo(String sql, RowMapper<T> mapper, Supplier<List<T>> respaldo, Object... params) {
-        List<T> bd = consultarLista(sql, mapper, params);
-        return bd != null ? bd : respaldo.get();
+    private static int entero(String valor) {
+        if (valor == null || valor.trim().isEmpty()) return 0;
+        try { return (int) Math.round(Double.parseDouble(valor.trim())); }
+        catch (NumberFormatException e) { return 0; }
     }
 
-    private <T> List<T> consultarLista(String sql, RowMapper<T> mapper, Object... params) {
-        Connection conn = ConexionBD.obtenerConexion();
-        if (conn == null) return null;
-        return consultarLista(conn, sql, mapper, params);
+    private static double decimal(String valor) {
+        if (valor == null || valor.trim().isEmpty()) return 0.0;
+        try { return Double.parseDouble(valor.trim()); }
+        catch (NumberFormatException e) { return 0.0; }
     }
 
-    private <T> List<T> consultarLista(Connection conn, String sql, RowMapper<T> mapper, Object... params) {
-        List<T> lista = new ArrayList<>();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            aplicarParametros(ps, params);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) lista.add(mapper.map(conn, rs));
-            }
-            return lista;
-        } catch (SQLException e) {
-            System.err.println("[RepositorioDatos] Error SQL: " + e.getMessage());
-            return null;
-        }
-    }
-
-    private boolean ejecutarUpdate(Connection conn, String sql, Object... params) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            aplicarParametros(ps, params);
-            return ps.executeUpdate() > 0;
-        }
-    }
-
-    @FunctionalInterface
-    private interface SqlBoolAction {
-        boolean run(Connection conn) throws SQLException;
-    }
-
-    private Boolean ejecutarConConexion(SqlBoolAction accion) {
-        Connection conn = ConexionBD.obtenerConexion();
-        if (conn == null) return null;
+    private static LocalDateTime leerFecha(String valor) {
+        if (valor == null || valor.trim().isEmpty()) return LocalDateTime.now();
         try {
-            return accion.run(conn);
-        } catch (SQLException e) {
-            System.err.println("[RepositorioDatos] Error SQL: " + e.getMessage());
-            return null;
+            String v = valor.trim();
+            if (v.length() > 19) v = v.substring(0, 19);
+            return LocalDateTime.parse(v, FORMATO_FECHA);
+        } catch (Exception e) {
+            return LocalDateTime.now();
         }
     }
 
-    private void ejecutarTransaccion(SqlTransaction tx) {
-        Connection conn = ConexionBD.obtenerConexion();
-        if (conn == null) return;
-        try {
-            conn.setAutoCommit(false);
-            tx.run(conn);
-            conn.commit();
-        } catch (SQLException e) {
-            try { conn.rollback(); } catch (SQLException ignored) {}
-            System.err.println("[RepositorioDatos] Error en transacción SQL: " + e.getMessage());
-        } finally {
-            try { conn.setAutoCommit(true); } catch (SQLException ignored) {}
-        }
-    }
-
-    private void aplicarParametros(PreparedStatement ps, Object... params) throws SQLException {
-        for (int i = 0; i < params.length; i++) {
-            Object val = params[i];
-            if (val == null) ps.setNull(i + 1, Types.NULL);
-            else if (val instanceof LocalDateTime) ps.setTimestamp(i + 1, Timestamp.valueOf((LocalDateTime) val));
-            else ps.setObject(i + 1, val);
-        }
-    }
-
-    private Integer resolverIdCategoria(Connection conn, String nombreCategoria) throws SQLException {
-        if (nombreCategoria == null || nombreCategoria.trim().isEmpty()) return null;
-        String nombre = nombreCategoria.trim();
-        List<Integer> ids = consultarLista(conn, "SELECT id_categoria FROM categorias WHERE LOWER(nombre) = LOWER(?)",
-            (c, rs) -> rs.getInt("id_categoria"), nombre);
-        if (ids != null && !ids.isEmpty()) return ids.get(0);
-
-        try (PreparedStatement ps = conn.prepareStatement("INSERT INTO categorias (nombre) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, nombre);
-            ps.executeUpdate();
-            try (ResultSet keys = ps.getGeneratedKeys()) {
-                return keys.next() ? keys.getInt(1) : null;
-            }
-        }
-    }
-
-    private Producto mapearProducto(Connection conn, ResultSet rs) throws SQLException {
-        return new Producto(rs.getString("codigo"), rs.getString("nombre"), rs.getString("categoria"),
-            rs.getString("subcategoria"), rs.getDouble("precio"), rs.getInt("stock"),
-            rs.getInt("stock_minimo"), rs.getString("estado"));
-    }
-
-    private Venta mapearVenta(Connection conn, ResultSet rs) throws SQLException {
-        String folio = rs.getString("folio");
-        List<ItemVenta> items = consultarLista(conn,
-            "SELECT numero_item, codigo_producto, descripcion, precio_unitario, cantidad, descuento FROM detalle_ventas WHERE folio_venta = ? ORDER BY numero_item",
-            (c, r) -> new ItemVenta(r.getInt("numero_item"), r.getString("codigo_producto"), r.getString("descripcion"),
-                r.getDouble("precio_unitario"), r.getInt("cantidad"), r.getDouble("descuento")), folio);
-        Venta v = new Venta(folio, rs.getString("cajero"), items != null ? items : new ArrayList<>(),
-            rs.getDouble("subtotal"), rs.getDouble("descuento"), rs.getDouble("iva"),
-            rs.getDouble("total"), rs.getString("metodo_pago"), rs.getDouble("paga_con"), rs.getDouble("cambio"));
-        Timestamp ts = rs.getTimestamp("fecha_hora");
-        if (ts != null) v.setFechaHora(ts.toLocalDateTime());
-        return v;
-    }
-
-    private Devolucion mapearDevolucion(Connection conn, ResultSet rs) throws SQLException {
-        String folio = rs.getString("folio_devolucion");
-        List<ItemDevolucion> items = consultarLista(conn,
-            "SELECT codigo_producto, descripcion, precio, cantidad_comprada, cantidad_devuelta FROM detalle_devoluciones WHERE folio_devolucion = ?",
-            (c, r) -> new ItemDevolucion(r.getString("codigo_producto"), r.getString("descripcion"),
-                r.getDouble("precio"), r.getInt("cantidad_comprada"), r.getInt("cantidad_devuelta")), folio);
-        Devolucion d = new Devolucion(folio, rs.getString("folio_venta_original"), rs.getString("motivo"),
-            rs.getBoolean("reintegrar_stock"), rs.getDouble("total_reembolso"), items != null ? items : new ArrayList<>());
-        Timestamp ts = rs.getTimestamp("fecha_hora");
-        if (ts != null) d.setFechaHora(ts.toLocalDateTime());
-        return d;
+    private static int numeroFolio(String folio, String prefijo) {
+        if (folio == null || !folio.startsWith(prefijo)) return 0;
+        try { return Integer.parseInt(folio.substring(prefijo.length()).trim()); }
+        catch (NumberFormatException e) { return 0; }
     }
 }
